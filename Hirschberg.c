@@ -172,10 +172,26 @@ Alignment hirschberg(const Strand *v, const Strand *w, const scoringModel *model
 
     size_t length = 0;
 
-    hirschberg_rec(v, 0, v->length, w, 0, w->length, model, &alignment, &length);
+    const Strand *rows = v;
+    const Strand *cols = w;
+    int flag = 0;
+
+    if(v->length > w->length) {
+        rows = w;
+        cols = v;
+        flag = 1;
+    }
+
+    hirschberg_rec(rows, 0, rows->length, cols, 0, cols->length, model, &alignment, &length);
 
     alignment.sequence1->length = length;
     alignment.sequence2->length = length;
+
+    if(flag) {
+        Strand *temp = alignment.sequence1;
+        alignment.sequence1 = alignment.sequence2;
+        alignment.sequence2 = temp;
+    }
 
     return alignment;
 
