@@ -1,0 +1,51 @@
+# Object files
+*.o
+
+# Executables
+main
+a.out
+
+# Debug / profiling
+*.out
+*.prof
+*.gcda
+*.gcno
+*.gcov
+
+# Sanitizers / temporary binaries
+test
+test_*
+benchmark
+
+# Generated results
+results/*.txt
+results/*.csv
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.o
+main
+a.out
+
+# clangd / editor cache
+.cache/
+compile_commands.json
+
+# Generated results
+results/*.txt
+results/*.csv
+
+# Temporary files
+*.swp
+*.swo
+*~
