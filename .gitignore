@@ -49,3 +49,8 @@ results/*.csv
 *.swp
 *.swo
 *~
+
+# Benchmark generated files
+bench/align_bench
+bench/results/*.csv
+bench/results/errors.log
