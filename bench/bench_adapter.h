@@ -1,9 +1,9 @@
 #ifndef BENCH_ADAPTER_H
 #define BENCH_ADAPTER_H
 
-#include "../alignment.h"
-#include "../scoring.h"
-#include "../strand.h"
+#include "alignment.h"
+#include "scoring.h"
+#include "strand.h"
 
 /*
  * Adapter tra il benchmark e le implementazioni reali del progetto.

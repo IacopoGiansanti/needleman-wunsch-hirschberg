@@ -8,10 +8,10 @@
 #include <string.h>
 #include <time.h>
 
-#include "../alignment.h"
-#include "../base.h"
-#include "../scoring.h"
-#include "../strand.h"
+#include "alignment.h"
+#include "base.h"
+#include "scoring.h"
+#include "strand.h"
 #include "bench_adapter.h"
 
 typedef enum {

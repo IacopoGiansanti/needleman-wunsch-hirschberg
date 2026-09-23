@@ -1,10 +1,10 @@
 #include "bench_adapter.h"
 
-#include "../Needleman-Wunsch.h"
-#include "../Hirschberg.h"
-#include "../alignment.h"
-#include "../strand.h"
-#include "../scoring.h"
+#include "Needleman-Wunsch.h"
+#include "Hirschberg.h"
+#include "alignment.h"
+#include "strand.h"
+#include "scoring.h"
 
 Alignment bench_run_needleman_wunsch(
     const Strand *a,
