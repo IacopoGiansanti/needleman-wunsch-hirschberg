@@ -60,8 +60,10 @@ tools/alignment_dump
 /visualization/
 
 # Tex
-*.latexmk
+*.fdb_latexmk
 *.fls
 *.out
 *.synctex.gz
 *.toc
+*.log
+*.aux
