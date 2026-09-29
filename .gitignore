@@ -57,7 +57,7 @@ bench/results/errors.log
 
 # Visualization
 tools/alignment_dump
-visualization/
+/visualization/
 
 # Tex
 *.latexmk
