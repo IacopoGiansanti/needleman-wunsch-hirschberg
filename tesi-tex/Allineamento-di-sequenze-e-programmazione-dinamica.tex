@@ -2,7 +2,7 @@
 
 \subsection{Rappresentazione delle sequenze biologiche}
 
-Il DNA è costituito da quattro tipi di nucelotidi, caratterizzati dalle basi seguenti azotate:
+Il DNA è costituito da quattro tipi di nucleotidi, caratterizzati dalle seguenti basi azotate:
 \begin{itemize}
     \item Adenina, $A$;
     \item Citosina, $C$;
@@ -16,8 +16,7 @@ I due filamenti della molecola sono complementari e antiparalleli, con appaiamen
 \end{matrix}
 \]
 
-Dal punto di vista computazione, un singolo filamento può essere rappresentato come una stringa sull'alfabeto
-con orientamenti opposti.
+Dal punto di vista computazionale, un singolo filamento può essere rappresentato come una stringa sull'alfabeto
 \[
     \Sigma_{\text{DNA}} = \{A,C,G,T\}.
 \]
@@ -26,13 +25,12 @@ Quindi una stringa di lunghezza $n$ ha forma
 \[
     x=x_1x_2\cdots x_n,\qquad x_i\in\Sigma_{DNA}\qquad \forall i \in\{1,\ldots,n\}.
 \]
-Una rappresentazione computazionale può allora considerare la stringa di DNA e i due filamenti tra di loro complementari.
 
 Una \emph{substring} è una porzione contigua di una stringa. Data una stringa di lunghezza $n$ esiste una substring di lunghezza $k$ per $k\leq n$.
 
-Un \emph{$k$-mero} è una substring di lunghezza $k$, $\exists k \in \mathbb{Z}_{\geq0}$
+Un \emph{$k$-mero} è una substring di lunghezza $k\geq1$.
 
-Una \emph{subsequence} è invece una nuova stringa ottenuta eliminando 0 o più elementi della stringa originale mantenendone l'ordine relativa.
+Una \emph{subsequence} è invece una nuova stringa ottenuta eliminando 0 o più elementi della stringa originale mantenendone l'ordine relativo.
 
 Mostriamo un esempio: sia $s$ una stringa che rappresenta una sequenza genomica,
 \[
@@ -41,20 +39,14 @@ Mostriamo un esempio: sia $s$ una stringa che rappresenta una sequenza genomica,
 allora $\texttt{AC}$ può essere sia una substring che una subsequence, mentre $\texttt{AT}$ è definibile soltanto come subsequence.
 
 Due sequenze genomiche omologhe possono differire tra loro a causa di mutazioni. Consideriamo tre eventi possibili associati a tali mutazioni:
+
 \[
-    \begin{matrix}
-        \quad\text{sostituzione} : & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AA} \\
-        \text{inserzione} :   & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AAC} \\
-        \text{delezione } :   & s=\texttt{AAC} & \longrightarrow & s'=\texttt{AC}
-    \end{matrix}
-   
+\begin{array}{r c l}
+    \texttt{AC}  & \xrightarrow{\text{sostituzione}} & \texttt{AA} \\
+    \texttt{AC}  & \xrightarrow{\text{inserzione}}   & \texttt{AAC} \\ 
+    \texttt{AAC} & \xrightarrow{\text{delezione}}    & \texttt{AC}
+\end{array}
 \]
-
- \begin{aligned}
-        s = \texttt{AC} \overset{\text{inserzione}}&{\longrightarrow} \texttt{AAC}
-
-    \end{aligned}
-    
 
 Gli ultimi due eventi verranno ogni tanto trattati come appartenenti a un unico tipo, dal nome \emph{indel}.
 
@@ -76,11 +68,11 @@ ovvero il numero di posizioni in cui due stringhe differiscono.
 La distanza di Hamming è però applicabile soltanto a stringhe della stessa lunghezza e non modella adeguatamente inserzioni e delezioni, che possono
 inoltre alterare la corrispondenza tra le posizioni delle due sequenze.
 
-Abbiamo quindi bisogno di una misura più precisa.
-Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni di editing (mutazioni)
-necessarie per trasformare una sequenza $v$ in una sequenza $w$.
+Abbiamo quindi bisogno di una misura più generale.
+Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni elementari
+di inserzione, delezione e sostituzione necessarie per trasformare una sequenza $v$ in una sequenza $w$.
 
-L'edit distance fornisce una misure della dissimilarità tra due sequenze. Per rappresentare esplicitamente le corrispondenze tra i loro simboli
+L'edit distance fornisce una misura della dissimilarità tra due sequenze. Per rappresentare esplicitamente le corrispondenze tra i loro simboli
 introduciamo ora il concetto di \textbf{allineamento}.
 
 Siano $v$ e $w$ due sequenze. Un allineamento di $v$ e $w$ è una matrice 
@@ -102,12 +94,7 @@ Ogni colonna di un allineamento corrisponde a uno dei seguenti casi:
     \item delezione;
 \end{itemize}
 
-Visualizziamo cosa è stato appena detto:
-
-siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate e $\mathcal{A}$ il loro allineamento, allora,
-
-\[
-    \begin{matrix}
+Visualizziamo cosa è stato appena detto: siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate e $\mathcal{A}$ il loro allineamento, allora, \[ \begin{matrix}
         v_{\text{aligned}} & : & A & C & T & - & G & C & A \\
         w_{\text{aligned}} & : & A & - & T & C & G & C & A
     \end{matrix}\enspace = \enspace\mathcal{A}
@@ -117,15 +104,15 @@ Per valutare la similarità tra simboli introduciamo una funzione di \textbf{sco
 \[
     \delta : ((\Sigma_{\text{DNA}}\cup \{ - \})^{2}\setminus \{ (-,-) \}) \to \mathbb{R},
 \]
-che date due basi $a$ e $b$ restituisce un valore reale, $\delta(a,b)$.
+che, dati due simboli $a$ e $b$, restituisce il contributo di score associato al loro allineamento.
 
 Una funzione di scoring (anche detta modello) per una sequenza di DNA è generalmente definita attribuendo un premio in caso di match e una penalità in caso contrario
 
 \[
     \delta(a,b)=
     \begin{cases}
-        +\mu, & a=b,\\
-        -\eta, & a\neq b, \\
+        +\mu, & a=b, \qquad a,b \in \Sigma_{\text{DNA}} \\
+        -\eta, & a\neq b, \qquad a,b \in \Sigma_{\text{DNA}}\\
         -\sigma, & \text{se esattamente uno tra }a, b \text{ è un gap}
     \end{cases}
 \]
@@ -145,16 +132,19 @@ Grazie alla funzione di scoring possiamo anche definire la \textbf{scoring matri
     \end{array}
 \]
 
+Siano $x,y$ le sequenze allineate corrispondenti rispettivamente a $v$ e $w$,\\
+quindi $x_{i},y_{i}\in \Sigma_{\text{DNA}} \cup \{ - \}$, $\forall i \in \{ 1,\ldots,L \}$.
+
 Sia
 \[
     \mathcal{A} = \begin{pmatrix}
-        v_{1} & \dots & v_{L} \\
-        w_{1} & \dots & w_{L}
+        x_{1} & \cdots & x_{L} \\
+        y_{1} & \cdots & y_{L}
     \end{pmatrix},
 \]
 allora, definiamo lo score complessivo dell'allineamento come
 \[
-    \text{score}(\mathcal{A}) = \sum^L_{i=1} \delta(v_i,w_i).
+    \text{score}(\mathcal{A}) = \sum^L_{i=1} \delta(x_i,y_i).
 \]
 
 Nel modello precedente ogni gap viene penalizzato indipendentemente.
@@ -163,15 +153,55 @@ Per questo motivo vengono spesso utilizzate penalità affini, che distinguono il
 Tale generalizzazione richiede stati aggiuntivi nella programmazione dinamica; nel seguito ci concentreremo tuttavia sul modello a penalità
 lineare utilizzato dagli algoritmi oggetto del confronto.
 
-Un problema deve specificare, almeno, input e output.
-Mentre un algoritmo ha il compito di restituire a ogni istanza valida dell'input, un output corretto.
+\subsection{Programmazione dinamica}
 
-Delineamo gli obiettivi computazionali che ci guideranno nel percorso:
-\begin{itemize}
-    \item calcolare il valore ottimo;
-    \item ricostruire una soluzione ottima;
-    \item riuscire a farlo utilizzando poca memoria.
-\end{itemize}
+La \emph{programmazione dinamica} è una tecnica algoritmica adatta a problemi caratterizzati da sottoproblemi sovrapposti
+e da una proprietà di sottostruttura ottima.
+I risultati dei sottoproblemi vengono memorizzati, evitando di calcolarli più volte.
+
+Nel problema di allineamento che considereremo, i sottoproblemi possono essere indicizzati mediante due indici $i$ e $j$.
+In particolare, una ricorrenza avrà tipicamente forma
+\[
+    P(i,j) =
+    F\bigl(P(i-1,j),P(i,j-1),P(i-1,j-1)\bigr).
+\]
+
+Siano $|v| = n$ e $|w| = m$. Indicheremo con
+\[
+    S_{i,j}
+\]
+il valore ottimo relativo ai prefissi
+\[
+     v_{1}\cdots v_{i} \qquad \text{e} w_{1} \cdots w_{j},
+\]
+con $0 \leq i \leq n$ e $0 \leq j \leq m$
+
+Nel caso dell'allineamento di sequenze, lo stato $S_{i,j}$ dipenderà dai tre stati
+\[
+    S_{i-1,j},\qquad S_{i,j-1},\qquad S_{i-1,j-1},
+\]
+che corrisponderanno rispettivamente a una delezione, un'inserzione e a un match o mismatch.
+
+Memorizzando esplicitamente tutti gli stati
+è necessaria una matrice di $(n+1)(m+1)$ elementi, e quindi uno spazio $O(nm)$
+
+Una volta calcolato il valore ottimo, una soluzione corrispondente può essere ricostruita memorizzando le scelte effettuate
+e percorrendole a ritroso mediante \emph{traceback} 
+
+\subsection{Longest Common Subsequence}
+
+Siano $v:=v_{1}\cdots v_{n}$ e $w:=w_{1}\cdots w_{n}$ due stringhe.
+Una \emph{common subsequence} di $v$ e $w$ è una sequenza di lunghezza $k$, identificata dagli indici
+\[
+    \begin{aligned}
+        1 \leq i_{1} < i_{2} < \cdots < i_{k} \leq n \\ 
+        1 \leq j_{1} < j_{2} < \cdots < j_{k} \leq m
+    \end{aligned}
+\]
+tali che
+\[
+    v_{i_{t}}=w_{j_{t}}\qquad \forall t \in \{ 1,\ldots,k \}
+\]
 
 
 Introduciamo allora tre stati per modellare la situazione appena trattata:
@@ -206,10 +236,16 @@ Lo stato principale $(3)$ combina quindi il match/mismatch con i due stati di ga
 
 Avendo definito il sistema di valutazione e di allineamento, possiamo studiarne la complessità
 
-\subsection{Programmazione dinamica}
-
-\subsection{Longest Common Subsequence}
 
 \subsection{Alignment graph e Manhattan Tourist Problem}
 
 \subsection{Global Alignment Problem}
+
+Delineamo gli obiettivi computazionali che ci guideranno nel percorso:
+\begin{itemize}
+    \item calcolare il valore ottimo;
+    \item ricostruire una soluzione ottima;
+    \item riuscire a farlo utilizzando poca memoria.
+\end{itemize}
+
+
