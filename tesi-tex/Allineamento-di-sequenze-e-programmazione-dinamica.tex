@@ -1,18 +1,27 @@
 \section{Definizione del Global Alignment problem e dei prerequisiti essenziali}
 
 \subsection{Rappresentazione delle sequenze biologiche}
-Sappiamo che il DNA è composto da 4 nucleotidi: Adenina, Citosina, Guanina e Timina; questi formano due catene complementari. Le basi si appaiano secondo
+
+Il DNA è costituito da quattro tipi di nucelotidi, caratterizzati dalle basi seguenti azotate:
+\begin{itemize}
+    \item Adenina, $A$;
+    \item Citosina, $C$;
+    \item Guanina, $G$;
+    \item Timina, $T$.
+\end{itemize}
+I due filamenti della molecola sono complementari e antiparalleli, con appaiamenti
 \[
 \begin{matrix}
     A \longleftrightarrow T & , & C\longleftrightarrow G
 \end{matrix}
 \]
+
+Dal punto di vista computazione, un singolo filamento può essere rappresentato come una stringa sull'alfabeto
 con orientamenti opposti.
-Possiamo quindi rappresentare una sequenza genomica come una \emph{stringa}.
-Una stringa è definita su un alfabeto finito; per il DNA:
 \[
-    \Sigma_{DNA} = \{A,C,G,T\}.
+    \Sigma_{\text{DNA}} = \{A,C,G,T\}.
 \]
+
 Quindi una stringa di lunghezza $n$ ha forma
 \[
     x=x_1x_2\cdots x_n,\qquad x_i\in\Sigma_{DNA}\qquad \forall i \in\{1,\ldots,n\}.
@@ -21,7 +30,9 @@ Una rappresentazione computazionale può allora considerare la stringa di DNA e 
 
 Una \emph{substring} è una porzione contigua di una stringa. Data una stringa di lunghezza $n$ esiste una substring di lunghezza $k$ per $k\leq n$.
 
-Una \emph{subsequence} è invece una stringa ottenuta scegliendo alcuni elementi della stringa originale e mantenendone l'ordine relativo, senza richiedere che siano contigui.
+Un \emph{$k$-mero} è una substring di lunghezza $k$, $\exists k \in \mathbb{Z}_{\geq0}$
+
+Una \emph{subsequence} è invece una nuova stringa ottenuta eliminando 0 o più elementi della stringa originale mantenendone l'ordine relativa.
 
 Mostriamo un esempio: sia $s$ una stringa che rappresenta una sequenza genomica,
 \[
@@ -31,38 +42,57 @@ allora $\texttt{AC}$ può essere sia una substring che una subsequence, mentre $
 
 Due sequenze genomiche omologhe possono differire tra loro a causa di mutazioni. Consideriamo tre eventi possibili associati a tali mutazioni:
 \[
-\begin{matrix}
-    \text{sostituzione} : & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AA} \\
-    \text{inserzione} :   & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AAC} \\
-    \text{delezione } :   & s=\texttt{AAC} & \longrightarrow & s'=\texttt{AC}
-\end{matrix}
+    \begin{matrix}
+        \quad\text{sostituzione} : & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AA} \\
+        \text{inserzione} :   & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AAC} \\
+        \text{delezione } :   & s=\texttt{AAC} & \longrightarrow & s'=\texttt{AC}
+    \end{matrix}
+   
 \]
+
+ \begin{aligned}
+        s = \texttt{AC} \overset{\text{inserzione}}&{\longrightarrow} \texttt{AAC}
+
+    \end{aligned}
+    
 
 Gli ultimi due eventi verranno ogni tanto trattati come appartenenti a un unico tipo, dal nome \emph{indel}.
 
+Supponiamo, quindi, di avere due sequenze genomiche omologhe che differiscono a causa di mutazioni genetiche; come possiamo quantificare e
+individuare la somiglianza tra le due sequenze?
+
 \subsection{Allineamento e modello di scoring}
 
-Dato che il nostro obiettivo è in parte quello di misurare la differenza tra due sequenze genetiche, trattiamo adesso la \emph{distanza di Hamming}, che è lo strumento più semplice per valutare la somiglianza tra due stringhe.
+Stiamo quindi iniziando a definire il problema di nostro interesse.
+
+Prima però chiariamo velocemente l'idea di problema e algoritmo in generale.
+
+Dato che un nostro obiettivo è quello di misurare la differenza tra due sequenze genetiche, trattiamo adesso la \emph{distanza di Hamming}, che è lo strumento più semplice per valutare la somiglianza tra due stringhe.
 Siano $x,y$ due stringhe della stessa lunghezza, allora la distanza di Hamming è
 \[
     d_H(x,y) := |\{i:x_i\neq y_i\}|,
 \]
 ovvero il numero di posizioni in cui due stringhe differiscono.
-Questa misura è però limitata quando sono presenti inserzioni e delezioni poiché con tali mutazioni l'ipotesi iniziale è probabile che smetta di essere verificata.
+La distanza di Hamming è però applicabile soltanto a stringhe della stessa lunghezza e non modella adeguatamente inserzioni e delezioni, che possono
+inoltre alterare la corrispondenza tra le posizioni delle due sequenze.
 
 Abbiamo quindi bisogno di una misura più precisa.
-Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni di editing (mutazioni) necessarie per trasformare una sequenza $v$ in una sequenza $w$.
+Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni di editing (mutazioni)
+necessarie per trasformare una sequenza $v$ in una sequenza $w$.
 
-Ora che abbiamo un valore da associare alle trasformazioni, passiamo alla loro rappresentazione,
-per farlo introduciamo il concetto di  \textbf{allineamento}:
+L'edit distance fornisce una misure della dissimilarità tra due sequenze. Per rappresentare esplicitamente le corrispondenze tra i loro simboli
+introduciamo ora il concetto di \textbf{allineamento}.
 
-Siano $v$ e $w$ due sequenze genomiche omologhe.
-
-Sia $\mathcal{A}$ una matrice di dimensione $2\times n$, dove $|v|,|w|\leq n\leq |v|+|w|$.
-
-Costruiamo $\mathcal{A}$ facendo corrispondere a ogni elemento $a_{i,1}$ della prima riga l'elemento $i$ di $v$; in maniera analoga riempiamo la seconda riga della matrice.
-Nel caso, però, in cui sia avvenuta una trasformazione (indel) in una delle due sequenze, significa che il numero di elementi è cambiato e si è formato un \emph{gap}, allora inseriamo il simbolo '$\texttt{-}$' in presenza di tali trasformazioni.\\
-$\mathcal{A}$ è un allineamento.
+Siano $v$ e $w$ due sequenze. Un allineamento di $v$ e $w$ è una matrice 
+\[
+    \mathcal{A}\in(\Sigma_{\text{DNA}}\cup \{ - \})^{2\times L},
+\]
+con,
+\[
+    \max \{ |v|,|w| \}\leq L \leq |v| + |w|,
+\]
+tale che, eliminando i simboli di gap dalla prima riga, si ottiene $v$, mentre eliminandoli dalla seconda si ottiene $w$.
+Non sono ammesse colonne contenenti due gap.
 
 Ogni colonna di un allineamento corrisponde a uno dei seguenti casi:
 \begin{itemize}
@@ -72,40 +102,77 @@ Ogni colonna di un allineamento corrisponde a uno dei seguenti casi:
     \item delezione;
 \end{itemize}
 
-Ecco un semplice esempio:
-siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate, allora,
+Visualizziamo cosa è stato appena detto:
+
+siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate e $\mathcal{A}$ il loro allineamento, allora,
 
 \[
     \begin{matrix}
         v_{\text{aligned}} & : & A & C & T & - & G & C & A \\
         w_{\text{aligned}} & : & A & - & T & C & G & C & A
-    \end{matrix}
+    \end{matrix}\enspace = \enspace\mathcal{A}
 \]
 
-Per valutare la similarità tra simboli introduciamo una funzione di \emph{scoring}
+Per valutare la similarità tra simboli introduciamo una funzione di \textbf{scoring},
 \[
-    \delta(a,b),
+    \delta : ((\Sigma_{\text{DNA}}\cup \{ - \})^{2}\setminus \{ (-,-) \}) \to \mathbb{R},
 \]
-dove $a$ e $b$ sono due basi.
+che date due basi $a$ e $b$ restituisce un valore reale, $\delta(a,b)$.
 
 Una funzione di scoring (anche detta modello) per una sequenza di DNA è generalmente definita attribuendo un premio in caso di match e una penalità in caso contrario
+
 \[
     \delta(a,b)=
     \begin{cases}
         +\mu, & a=b,\\
-        -\sigma, & a\neq b
+        -\eta, & a\neq b, \\
+        -\sigma, & \text{se esattamente uno tra }a, b \text{ è un gap}
     \end{cases}
 \]
-con $\mu,\sigma > 0$.
+con $\mu,\eta,\sigma > 0$.
+Il modello in cui mismatch e gap hanno la stessa penalità si ottiene come caso particolare ponendo $\eta = \sigma$.
 
-Finora inserzioni e delezioni sono state trattate come eventi independenti. Biologicamente, però, una sequenza di gap consecutivi può essere
-intrerpretata meglio come un unico evento mutazionale di una certa lunghezza.
-
-Con una penalità affine, un gap di lunghezza $x$ ha costo
+Grazie alla funzione di scoring possiamo anche definire la \textbf{scoring matrix}, 
 \[
-    -(\rho + \sigma x),
+    \begin{array}{c|ccccc}
+    \delta & A & C & G & T & -\\
+    \hline
+    A & +\mu & -\eta & -\eta & -\eta & -\sigma\\
+    C & -\eta & +\mu & -\eta & -\eta & -\sigma\\
+    G & -\eta & -\eta & +\mu & -\eta & -\sigma\\
+    T & -\eta & -\eta & -\eta & +\mu & -\sigma\\
+    - & -\sigma & -\sigma & -\sigma & -\sigma & \text{n.a.}
+    \end{array}
 \]
-dove $\rho>0$ è la penalità di apertura del gap e $\sigma>0$ è la penalità per ciascun simbolo del gap.
+
+Sia
+\[
+    \mathcal{A} = \begin{pmatrix}
+        v_{1} & \dots & v_{L} \\
+        w_{1} & \dots & w_{L}
+    \end{pmatrix},
+\]
+allora, definiamo lo score complessivo dell'allineamento come
+\[
+    \text{score}(\mathcal{A}) = \sum^L_{i=1} \delta(v_i,w_i).
+\]
+
+Nel modello precedente ogni gap viene penalizzato indipendentemente.
+Una successione di gap consecutivi può tuttavia essere interpretata come risultato di un unico evento di inserzione o delezione.
+Per questo motivo vengono spesso utilizzate penalità affini, che distinguono il costo di apertura di un gap da quelo della sua estensione.
+Tale generalizzazione richiede stati aggiuntivi nella programmazione dinamica; nel seguito ci concentreremo tuttavia sul modello a penalità
+lineare utilizzato dagli algoritmi oggetto del confronto.
+
+Un problema deve specificare, almeno, input e output.
+Mentre un algoritmo ha il compito di restituire a ogni istanza valida dell'input, un output corretto.
+
+Delineamo gli obiettivi computazionali che ci guideranno nel percorso:
+\begin{itemize}
+    \item calcolare il valore ottimo;
+    \item ricostruire una soluzione ottima;
+    \item riuscire a farlo utilizzando poca memoria.
+\end{itemize}
+
 
 Introduciamo allora tre stati per modellare la situazione appena trattata:
 \begin{itemize}
@@ -114,7 +181,7 @@ Introduciamo allora tre stati per modellare la situazione appena trattata:
     \item[(3)] $S_{i,j}^{\rightarrow}$ : miglior allineamento che termina con una inserzione, quindi con un gap nella prima sequenza.
 \end{itemize}
 
-Le transizioni dei due stati, $(1),(2)$, di gap distinguono apertura e continuazione:
+Le transizioni dei due stati di gap, $(1)$ e $(2)$, distinguono apertura e continuazione:
 \[
     S^{\downarrow}_{i,j}=\max\left\{
     S^{\downarrow}_{i-1,j}-\sigma,
@@ -137,8 +204,7 @@ Lo stato principale $(3)$ combina quindi il match/mismatch con i due stati di ga
     \right\}.
 \]
 
-Tramite questo sistema possiamo calcolarne la complessità,
-
+Avendo definito il sistema di valutazione e di allineamento, possiamo studiarne la complessità
 
 \subsection{Programmazione dinamica}
 
