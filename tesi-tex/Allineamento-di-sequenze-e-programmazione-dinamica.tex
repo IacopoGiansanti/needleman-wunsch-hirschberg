@@ -1,0 +1,149 @@
+\section{Definizione del Global Alignment problem e dei prerequisiti essenziali}
+
+\subsection{Rappresentazione delle sequenze biologiche}
+Sappiamo che il DNA è composto da 4 nucleotidi: Adenina, Citosina, Guanina e Timina; questi formano due catene complementari. Le basi si appaiano secondo
+\[
+\begin{matrix}
+    A \longleftrightarrow T & , & C\longleftrightarrow G
+\end{matrix}
+\]
+con orientamenti opposti.
+Possiamo quindi rappresentare una sequenza genomica come una \emph{stringa}.
+Una stringa è definita su un alfabeto finito; per il DNA:
+\[
+    \Sigma_{DNA} = \{A,C,G,T\}.
+\]
+Quindi una stringa di lunghezza $n$ ha forma
+\[
+    x=x_1x_2\cdots x_n,\qquad x_i\in\Sigma_{DNA}\qquad \forall i \in\{1,\ldots,n\}.
+\]
+Una rappresentazione computazionale può allora considerare la stringa di DNA e i due filamenti tra di loro complementari.
+
+Una \emph{substring} è una porzione contigua di una stringa. Data una stringa di lunghezza $n$ esiste una substring di lunghezza $k$ per $k\leq n$.
+
+Una \emph{subsequence} è invece una stringa ottenuta scegliendo alcuni elementi della stringa originale e mantenendone l'ordine relativo, senza richiedere che siano contigui.
+
+Mostriamo un esempio: sia $s$ una stringa che rappresenta una sequenza genomica,
+\[
+    s:= \texttt{ACCT},
+\]
+allora $\texttt{AC}$ può essere sia una substring che una subsequence, mentre $\texttt{AT}$ è definibile soltanto come subsequence.
+
+Due sequenze genomiche omologhe possono differire tra loro a causa di mutazioni. Consideriamo tre eventi possibili associati a tali mutazioni:
+\[
+\begin{matrix}
+    \text{sostituzione} : & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AA} \\
+    \text{inserzione} :   & s=\texttt{AC}  & \longrightarrow & s'=\texttt{AAC} \\
+    \text{delezione } :   & s=\texttt{AAC} & \longrightarrow & s'=\texttt{AC}
+\end{matrix}
+\]
+
+Gli ultimi due eventi verranno ogni tanto trattati come appartenenti a un unico tipo, dal nome \emph{indel}.
+
+\subsection{Allineamento e modello di scoring}
+
+Dato che il nostro obiettivo è in parte quello di misurare la differenza tra due sequenze genetiche, trattiamo adesso la \emph{distanza di Hamming}, che è lo strumento più semplice per valutare la somiglianza tra due stringhe.
+Siano $x,y$ due stringhe della stessa lunghezza, allora la distanza di Hamming è
+\[
+    d_H(x,y) := |\{i:x_i\neq y_i\}|,
+\]
+ovvero il numero di posizioni in cui due stringhe differiscono.
+Questa misura è però limitata quando sono presenti inserzioni e delezioni poiché con tali mutazioni l'ipotesi iniziale è probabile che smetta di essere verificata.
+
+Abbiamo quindi bisogno di una misura più precisa.
+Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni di editing (mutazioni) necessarie per trasformare una sequenza $v$ in una sequenza $w$.
+
+Ora che abbiamo un valore da associare alle trasformazioni, passiamo alla loro rappresentazione,
+per farlo introduciamo il concetto di  \textbf{allineamento}:
+
+Siano $v$ e $w$ due sequenze genomiche omologhe.
+
+Sia $\mathcal{A}$ una matrice di dimensione $2\times n$, dove $|v|,|w|\leq n\leq |v|+|w|$.
+
+Costruiamo $\mathcal{A}$ facendo corrispondere a ogni elemento $a_{i,1}$ della prima riga l'elemento $i$ di $v$; in maniera analoga riempiamo la seconda riga della matrice.
+Nel caso, però, in cui sia avvenuta una trasformazione (indel) in una delle due sequenze, significa che il numero di elementi è cambiato e si è formato un \emph{gap}, allora inseriamo il simbolo '$\texttt{-}$' in presenza di tali trasformazioni.\\
+$\mathcal{A}$ è un allineamento.
+
+Ogni colonna di un allineamento corrisponde a uno dei seguenti casi:
+\begin{itemize}
+    \item match;
+    \item mismatch (sostituzione);
+    \item inserzione;
+    \item delezione;
+\end{itemize}
+
+Ecco un semplice esempio:
+siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate, allora,
+
+\[
+    \begin{matrix}
+        v_{\text{aligned}} & : & A & C & T & - & G & C & A \\
+        w_{\text{aligned}} & : & A & - & T & C & G & C & A
+    \end{matrix}
+\]
+
+Per valutare la similarità tra simboli introduciamo una funzione di \emph{scoring}
+\[
+    \delta(a,b),
+\]
+dove $a$ e $b$ sono due basi.
+
+Una funzione di scoring (anche detta modello) per una sequenza di DNA è generalmente definita attribuendo un premio in caso di match e una penalità in caso contrario
+\[
+    \delta(a,b)=
+    \begin{cases}
+        +\mu, & a=b,\\
+        -\sigma, & a\neq b
+    \end{cases}
+\]
+con $\mu,\sigma > 0$.
+
+Finora inserzioni e delezioni sono state trattate come eventi independenti. Biologicamente, però, una sequenza di gap consecutivi può essere
+intrerpretata meglio come un unico evento mutazionale di una certa lunghezza.
+
+Con una penalità affine, un gap di lunghezza $x$ ha costo
+\[
+    -(\rho + \sigma x),
+\]
+dove $\rho>0$ è la penalità di apertura del gap e $\sigma>0$ è la penalità per ciascun simbolo del gap.
+
+Introduciamo allora tre stati per modellare la situazione appena trattata:
+\begin{itemize}
+    \item[(1)] $S_{i,j}$: miglior allineamento dei prefissi che termina normalmente;
+    \item[(2)] $S_{i,j}^{\downarrow}$: miglior allineamento che termina con una delezione, quindi con un gap nella seconda sequenza;
+    \item[(3)] $S_{i,j}^{\rightarrow}$ : miglior allineamento che termina con una inserzione, quindi con un gap nella prima sequenza.
+\end{itemize}
+
+Le transizioni dei due stati, $(1),(2)$, di gap distinguono apertura e continuazione:
+\[
+    S^{\downarrow}_{i,j}=\max\left\{
+    S^{\downarrow}_{i-1,j}-\sigma,
+    S_{i-1,j}-(\rho+\sigma)
+    \right\},
+\]
+\[
+    S^{\rightarrow}_{i,j}=\max\left\{
+    S^{\rightarrow}_{i,j-1}-\sigma,
+    S_{i,j-1}-(\rho+\sigma)
+    \right\}.
+\]
+
+Lo stato principale $(3)$ combina quindi il match/mismatch con i due stati di gap:
+\[
+    S_{i,j}=\max\left\{
+    S_{i-1,j-1}+\delta(v_i,w_j),
+    S^{\downarrow}_{i,j},
+    S^{\rightarrow}_{i,j}
+    \right\}.
+\]
+
+Tramite questo sistema possiamo calcolarne la complessità,
+
+
+\subsection{Programmazione dinamica}
+
+\subsection{Longest Common Subsequence}
+
+\subsection{Alignment graph e Manhattan Tourist Problem}
+
+\subsection{Global Alignment Problem}

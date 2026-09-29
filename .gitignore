@@ -58,3 +58,10 @@ bench/results/errors.log
 # Visualization
 tools/alignment_dump
 visualization/
+
+# Tex
+*.latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
