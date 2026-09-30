@@ -23,7 +23,7 @@ Dal punto di vista computazionale, un singolo filamento può essere rappresentat
 
 Quindi una stringa di lunghezza $n$ ha forma
 \[
-    x=x_1x_2\cdots x_n,\qquad x_i\in\Sigma_{DNA}\qquad \forall i \in\{1,\ldots,n\}.
+    x=x_1x_2\cdots x_n,\qquad x_i\in\Sigma_{\text{DNA}}\qquad \forall i \in\{1,\ldots,n\}.
 \]
 
 Una \emph{substring} è una porzione contigua di una stringa. Data una stringa di lunghezza $n$ esiste una substring di lunghezza $k$ per $k\leq n$.
@@ -56,8 +56,6 @@ individuare la somiglianza tra le due sequenze?
 \subsection{Allineamento e modello di scoring}
 
 Stiamo quindi iniziando a definire il problema di nostro interesse.
-
-Prima però chiariamo velocemente l'idea di problema e algoritmo in generale.
 
 Dato che un nostro obiettivo è quello di misurare la differenza tra due sequenze genetiche, trattiamo adesso la \emph{distanza di Hamming}, che è lo strumento più semplice per valutare la somiglianza tra due stringhe.
 Siano $x,y$ due stringhe della stessa lunghezza, allora la distanza di Hamming è
@@ -239,7 +237,7 @@ utilizzando una common subsequence di lunghezza $k$ richiede
 \]
 operazioni. Per una LCS, con $k=s(v,w)$, si ottiene quindi 
 \[
-    d_{\text{indel}}(v,w) = n + m - 2k
+    d_{\text{indel}}(v,w) = n + m - 2s(v,w)
 \]
 
 Il problema della LCS può quindi essere ricondotto alla ricerca di un cammino di peso massimo
@@ -258,7 +256,7 @@ Da ogni nodo sono possibili tre tipi di movimento:
     \item $(i-1,j-1)\rightarrow(i,j)$, soltanto quando $v_i=w_j$.
 \end{itemize}
 
-Nel problema dell'LCS assegniamo un peso a ogni arco, $w(e)$, dove $e \in E$, con $E$ insieme degli archi della griglia.
+Nel problema della LCS assegniamo un peso a ogni arco, $w(e)$, dove $e \in E$, con $E$ insieme degli archi della griglia.
 \[
     w(e) = \begin{cases}
         1, & \text{arco diagonale corrispondente a un match},\\
@@ -269,7 +267,11 @@ Nel problema dell'LCS assegniamo un peso a ogni arco, $w(e)$, dove $e \in E$, co
 Il problema della LCS può quindi essere ricondotto alla ricerca di un cammino di peso massimo da $(0,0)$ a $(n,m)$ nel DAG associato alla griglia descritta sopra.
 
 Sia $S_{i,j}$ la lunghezza di una LCS tra $v_{1}\cdots v_{i}$ e $w_{1} \cdots w_{j}$.
-Siano $S_{i,0}=0=S_{0,j}$
+Siano 
+\[
+    S_{i,0} = 0, \qquad S_{0,j} = 0.
+\]
+
 
 Allora possiamo così definire la ricorrenza:
 \[
@@ -282,7 +284,7 @@ Allora possiamo così definire la ricorrenza:
 
 I primi due termini corrispondono rispettivamente a non utilizzare $v_{i}$ oppure $w_{j}$ nella subsequence comune.
 Se invece $v_{i} = w_{j}$, è possibile utilizzare entrambi i simboli aggiungendo 1 alla soluzione relativa ai prefissi
-precedenti. La struttura della ricorrenza riprende quindi la dipendenza dai tre setteproblemi introddo nella sezione precedente.
+precedenti. La struttura della ricorrenza riprende quindi la dipendenza dai tre sottoproblemi introdotti nella sezione precedente.
 
 Poiché gli stati sono $(n+1)(m+1)$, memorizzare l'intera matrice richiede spazio
 \[
@@ -294,7 +296,7 @@ Poiché ogni stato viene calcolato utilizzando un numero costante di operazioni,
 \]
 
 Se interessa soltanto la lunghezza della LCS, è sufficiente mantenere in memoria le righe necessarie al calcolo,
-riduenco così lo spazio a $O(\min(n,m))$.
+riducendo così lo spazio a $O(\min(n,m))$.
 
 \subsection{Alignment graph}
 
@@ -333,9 +335,10 @@ A ogni mossa è associata, quindi, un arco del grafo. Il peso di ogni arco è de
     \begin{aligned}
         w\bigl((i-1,j)\to(i,j)\bigr) &=\delta(v_i,-),\\
         w\bigl((i,j-1)\to(i,j)\bigr) &=\delta(-,w_j),\\
-        w\bigl((i-1,j-1)\to(i,j)\bigr) &=\delta(v_i,w_j).
+        w\bigl((i-1,j-1)\to(i,j)\bigr) &=\delta(v_i,w_j),
     \end{aligned}
 \]
+con $\delta$ funzione di scoring.
 
 Il peso di un cammino coincide quindi con lo score dell'allineamento
 corrispondente.
@@ -349,7 +352,7 @@ Siano $v$ e $w$ due sequenze e sia $\delta$ la funzione di scoring definita prec
 
 Dato un allineamento
 \[
-    \mathcal{A}= \begin{pmatrix}
+    A= \begin{pmatrix}
         x_{1} & x_{2} & \cdots & x_r \\
         y_{1} & y_{2} & \cdots & y_r
     \end{pmatrix}

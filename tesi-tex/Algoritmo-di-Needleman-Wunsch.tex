@@ -2,8 +2,247 @@
 
 \subsection{Ricorrenza, inizializzazione e traceback}
 
+Sia $S_{i,j}$ il miglior score globale tra $v_{1}\cdots v_{i}$ e $w_{1} \cdots w_{j}$, con $0 \leq i \leq n, 0 \leq j \leq m$.
+Quindi, come visto nel precedente capitolo, possiamo affermare che $S_{i,j}$ coincide con il peso di un cammino massimo da $(0,0)$ a $(i,j)$.
+
+Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilità:
+\begin{itemize}
+    \item \textbf{Delezione}
+
+        L'ultima colonna è
+        \[
+            \begin{pmatrix}
+                v_{i} \\ -
+            \end{pmatrix}
+        \]
+        quindi prima di essa è stato allineato $v_{1}\cdots v_{i-1}$ con $w_{1}\cdots w_{j}$.\\
+        Il contributo è
+        \[
+            S_{i-1,j} + \delta(v_{i},-)
+        \]
+    \item \textbf{Inserzione}
+
+        L'ultima colonna è
+        \[
+            \begin{pmatrix}
+                - \\ w_{j}
+            \end{pmatrix}
+        \]
+        quindi prima di essa è stato allineato $v_{1}\cdots v_{i}$ con $w_{1}\cdots w_{j-1}$.\\
+        Il contributo è
+        \[
+            S_{i,j-1} + \delta(-,w_{j})
+        \]
+    \item \textbf{Match o mismatch}
+
+        L'ultima colonna è
+        \[
+            \begin{pmatrix}
+                v_{i} \\ w_{j}
+            \end{pmatrix}
+        \]
+        quindi prima di essa è stato allineato $v_{1}\cdots v_{i-1}$ con $w_{1}\cdots w_{j-1}$.\\
+        Il contributo è
+        \[
+            S_{i-1,j-1} + \delta(v_{i},w_{j})
+        \]       
+\end{itemize}
+
+Per gli stati interni dell'allineamento, con $1 \leq i \leq n$ e $1 \leq j \leq m$, possiamo formulare la ricorrenza a partire dai tre possibili predecessori.
+Prima però è necessario inizializzare gli stati sul bordo della matrice, che corrispondono con i casi base del problema dell'allineamento globale:
+\[
+    \begin{aligned}
+        S_{0,0}&=0; \\
+        S_{i,0}&= S_{i-1,0}+ \delta( v_{i}, -)= -i\sigma;\\
+        S_{0,j}&= S_{0,j-1}+ \delta(-, w_{j})= -j\sigma.
+    \end{aligned} 
+\]
+A differenza della LCS, gli stati sul bordo non hanno valore nullo: nel global alignment l'intero prefisso deve essere allineato.
+Allineare $v_{1}\cdots v_{i}$ con la stringa vuota richiede quindi $i$ gap, mentre allineare la stringa vuota con $w_{1}\cdots w_{j}$ ne richiede $j$.
+
+Possiamo, quindi, formalizzare la \emph{ricorrenza}:
+\[
+    \boxed{
+        S_{i,j}
+        =
+        \max
+        \begin{cases}
+            S_{i-1,j}+\delta(v_i,-),\\
+            S_{i,j-1}+\delta(-,w_j),\\
+            S_{i-1,j-1}+\delta(v_i,w_j)
+        \end{cases}
+    }
+\]
+con $1 \leq i \leq n$ e $1 \leq j \leq m$.
+
+Questa relazione costituisce la ricorrenza fondamentale dell'algoritmo di Needleman-Wunsch.
+
+Il calcolo di $S_{n,m}$ soddisfa il primo degli obiettivi formulati nel capitolo precedente, fornendo
+\[
+    S_{n,m} = \operatorname{OPT}(v,w).
+\]
+Per ricostruire anche un allineamento che realizzi tale score è necessario mantenere l'informazione relativa alle scelte effettuate durante il calcolo.
+Quindi, durante il calcolo di $S_{i,j}$, possiamo memorizzare quale predecessore ha prodotto il massimo all'interno di una matrice $B$:
+\[
+    B_{i,j} \in \{ \uparrow, \leftarrow, \nwarrow \}.
+\]
+Sul bordo della matrice il predecessore è univocamente determinato:
+\[
+   \begin{aligned}
+       B_{i,0}=&\uparrow,&i=1,\ldots,n,\\
+       B_{0,j}=&\leftarrow,&j=1,\ldots,m.
+   \end{aligned}
+\]
+
+A ciascuna direzione memorizzata in $B_{i,j}$ corrisponde una colonna dell'allineamento secondo la seguente associazione:
+\[
+    \begin{array}{c|c}
+        B_{i,j} & \text{colonna dell'allineamento}\\
+        \hline
+        \uparrow & (v_i,-)\\
+        \leftarrow & (-,w_j)\\
+        \nwarrow & (v_i,w_j)
+    \end{array}
+\]
+
+Così facendo, partendo da $(n,m)$ possiamo ricostruire l'allineamento percorrendo i predecessori fino a $(0,0)$.
+Notiamo però che tramite il \emph{backtracking} le colonne vengono generate in ordine contrario, quindi al termine vanno invertite.
+
+In caso di parità tra più transizioni esistono più cammini, e quindi potenzialmente più allineamenti ottimi.
+Se l'obiettivo è ricostruire un singolo allineamento ottimo, è sufficiente adottare una regola deterministica di tie-breaking;
+per rappresentare tutti gli allineamenti ottimi sarebbe invece necessario conservare tutti i predecessori che realizzano il massimo.
+
 \subsection{Pseudocodice}
 
+Possiamo adesso scrivere lo pseudocodice per l'algoritmo di Needleman-Wunsch.
+
+\begin{lstlisting}[style=pseudo,caption={Global Alignment}]
+NeedlemanWunsch(v,w,delta)
+    n <- |v| 
+    m <- |w|
+
+    // inizializzazione
+    S[0,0] <- 0
+    for i <- 1,...,n
+        S[i,0] <- S[i-1,0] + delta(v[i],'-')
+        B[i,0] <- up
+    for j <- 1,...,m
+        S[0,j] <- S[0,j-1] + delta('-',w[j])
+        B[0,j] <- left
+
+    // ricorrenza
+    for i <- 1,...,n
+        for j <- 1,...,m
+            up       <- S[i-1,j] + delta(v[i],'-')
+            left     <- S[i,j-1] + delta('-',w[j])
+            diagonal <- S[i-1,j-1] + delta(v[i],w[j])
+            S[i,j] <- max(up, left, diagonal)
+            B[i,j] <- predecessore che ha prodotto il massimo
+
+    // ricostruzione dell'allineamento
+    alignment <- Backtrack(B,v,w,n,m)
+
+    return (S[n,m] , alignment)
+\end{lstlisting}
+
+Adottiamo una politica deterministica di tie-breaking che assegna priorità, nell'ordine, allo spostamento diagnoale, verticale e orizzontale.
+Possiamo quindi scrivere lo pseudocodice del traceback in questa maniera.
+
+\begin{lstlisting}[style=pseudo,caption={Ricostruzione dell'allineamento tramite traceback}]
+Backtrack(B,v,w,i,j)
+    alignedV <- empty
+    alignedW <- empty
+
+    while i > 0 or j > 0
+        if B[i,j] = diagonal
+            append v[i] to alignedV
+            append w[j] to alignedW
+            i <- i - 1
+            j <- j - 1
+
+        else if B[i,j] = up
+            append v[i] to alignedV
+            append '-' to alignedW
+            i <- i - 1
+
+        else
+            append '-' to alignedV
+            append w[j] to alignedW
+            j <- j - 1
+
+    reverse alignedV
+    reverse alignedW
+
+    return (alignedV,alignedW)
+\end{lstlisting}
+
+Quindi, la prima procedura costruisce la matrice degli score e quella dei predecessori; la seconda utilizza quest'ultima per ricostruire
+un allineamento ottimo a partire dalla cella $(n,m)$.
+
 \subsection{Analisi della complessità}
+
+Abbiamo allora definito l'algoritmo standard di Needleman-Wunsch.
+Possiamo adesso analizzarne la complessità, centro del nostro confronto.
+
+Sia $T(n,m)$ la complessità di esecuzione, temporale, dell'algoritmo.
+Sia $S(n,m)$ la complessità spaziale dell'algoritmo.
+
+Allora,
+\[
+    T(n,m) = \Theta(nm),
+\]
+poiché la matrice contiene $(n+1)(m+1)$ stati e ciascuno viene calcolato mediante un numero costante di operazioni.
+
+Memorizzando l'intera matrice avremo
+\[
+    S(n,m) = \Theta(nm).
+\]
+
+Pertanto, per sequenze di lunghezza dello stesso ordine, tempo e spazio crescono quadraticamente rispetto alla lunghezza.
+
+La crescita quadratica dello spazio può quindi diventare un limite per sequenze di grandi dimensioni, poiché memorizzare l'intera matrice richiede
+una quantità di memoria proporzionale al prodotto delle lunghezze delle due sequenze.
+
+Inoltre, non abbiamo ancora considerato il costo del traceback.
+Un cammino da $(n,m)$ a $(0,0)$ contiene al più $n+m$ archi, quindi, il traceback percorre al massimo $n+m$ celle, richiedendo tempo
+\[
+    T_{\text{traceback}}(n,m) = O(n+m),
+\]
+Inoltre, l'allineamento prodotto può contenere al massimo $n+m$ colonne, e richiede quindi
+\[
+    O(n+m)
+\]
+spazio per la memorizzazione dell'output.
+
+Pertanto, il costo temporale complessivo dell'algoritmo rimane
+\[
+    T(n,m) = \Theta(nm) + O(n+m) = \Theta(nm),
+\]
+mentre la complessità spaziale complessiva della versione standard è
+\[
+    S(n,m) = \Theta(nm) + O(n+m) = \Theta(nm).
+\]
+
+Sappiamo che, per calcolare
+\[
+    S_{i,j}
+\]
+abbiamo bisogno di
+\[
+    S_{i-1,j}, \qquad S_{i,j-1}, \qquad S_{i-1,j-1}.
+\]
+Allora, non è difficile notare come il calcolo della colonna $j$ richiede soltanto la colonna $j-1$ e i valori già calcolati della colonna $j$.
+Quindi, se riduciamo il problema soltanto al calcolo del punteggio ottimo, potremmo diminuire lo spazio necessario, andando ad usare soltanto
+due vettori di $n+1$ o $m+1$ elementi, scegliendo opportunatamente la sequenza più corta, ottenendo quindi uno spazio lineare.
+\[
+    S_{\text{score}}(n,m) = \Theta\bigl(\min \{ n,m \}\bigr).
+\]
+Notiamo che la complessità nel tempo non cambia.
+
+Tale ottimizzazione consente quindi di soddisfare il primo obiettivo computazionale, ossia il calcolo dello score ottimo, 
+utilizzando spazio lineare. Tuttavia, eliminando le celle già utilizzate vengono perse anche le informazioni necessarie per effettuare
+il traceback e ricostruire un allineamento ottimo. Il problema diventa quindi quello di ottenere anche la soluzione,
+e non soltanto il suo valore, mantenendo una complessità spaziale lineare.
+
 
 \subsection{Implementazione}
