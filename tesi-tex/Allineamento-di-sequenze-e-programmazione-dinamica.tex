@@ -190,62 +190,200 @@ e percorrendole a ritroso mediante \emph{traceback}
 
 \subsection{Longest Common Subsequence}
 
-Siano $v:=v_{1}\cdots v_{n}$ e $w:=w_{1}\cdots w_{n}$ due stringhe.
-Una \emph{common subsequence} di $v$ e $w$ è una sequenza di lunghezza $k$, identificata dagli indici
+Una \emph{common subsequence} di due stringhe $v$ e $w$ è una stringa che è una subsequence sia di $v$ sia di $w$.
+
+Quindi, siano
 \[
-    \begin{aligned}
-        1 \leq i_{1} < i_{2} < \cdots < i_{k} \leq n \\ 
-        1 \leq j_{1} < j_{2} < \cdots < j_{k} \leq m
-    \end{aligned}
+    v=v_{1}v_{2} \cdots v_{n}, \qquad w = w_{1}w_{2}\cdots w_{m}.
+\]
+Una stringa
+\[
+    z =z_{1}z_{2} \cdots z_{k}
+\]
+è una common subsequence di $v$ e $w$ se esistono indici
+\[
+    1 \leq i_{1} < i_{2} < \cdots < i_{k} \leq n
+\]
+e
+\[
+    1 \leq j_{1} < j_{2} < \cdots < j_{k} \leq m
 \]
 tali che
 \[
-    v_{i_{t}}=w_{j_{t}}\qquad \forall t \in \{ 1,\ldots,k \}
+    z_{t} = v_{i_{t}} = w_{j_{t}}, \qquad \forall t \in \{ 1,\ldots,k \}
 \]
 
+Facciamo un esempio per chiarire:
 
-Introduciamo allora tre stati per modellare la situazione appena trattata:
+Siano
+\[
+    v:= \texttt{ACCT}, \qquad w:= \texttt{ACT}.
+\]
+Allora, la stringa
+\[
+    z= \texttt{ACT}
+\]
+è una common subsequence.
+
+Tra tutte le common subsequence di $v$ e $w$, siamo interessati a quella di lunghezza massima, detta \textbf{Longest Common Subsequence} (LCS).
+
+Indichiamo con $s(v,w)$ la lunghezza di una LCS tra $v$ e $w$:
+\[
+    s(v,w) =  \max \{ |z|:z \text{ è una common subsequence di }v \text{ e }w \}
+\]
+
+Considerando una variante dell'edit distance in cui sono ammesse soltanto inserzioni e delezioni, trasformare $v$ in $w$
+utilizzando una common subsequence di lunghezza $k$ richiede
+\[
+    (n-k) + (m-k)
+\]
+operazioni. Per una LCS, con $k=s(v,w)$, si ottiene quindi 
+\[
+    d_{\text{indel}}(v,w) = n + m - 2k
+\]
+
+Il problema della LCS può quindi essere ricondotto alla ricerca di un cammino di peso massimo
+da $(0,0)$ a $(n,m)$.
+
+A ogni coppia di prefissi
+\[
+    v_1\cdots v_i,\qquad w_1\cdots w_j
+\]
+associamo un nodo $(i,j)$.
+
+Da ogni nodo sono possibili tre tipi di movimento:
 \begin{itemize}
-    \item[(1)] $S_{i,j}$: miglior allineamento dei prefissi che termina normalmente;
-    \item[(2)] $S_{i,j}^{\downarrow}$: miglior allineamento che termina con una delezione, quindi con un gap nella seconda sequenza;
-    \item[(3)] $S_{i,j}^{\rightarrow}$ : miglior allineamento che termina con una inserzione, quindi con un gap nella prima sequenza.
+    \item $(i-1,j)\rightarrow(i,j)$;
+    \item $(i,j-1)\rightarrow(i,j)$;
+    \item $(i-1,j-1)\rightarrow(i,j)$, soltanto quando $v_i=w_j$.
 \end{itemize}
 
-Le transizioni dei due stati di gap, $(1)$ e $(2)$, distinguono apertura e continuazione:
+Nel problema dell'LCS assegniamo un peso a ogni arco, $w(e)$, dove $e \in E$, con $E$ insieme degli archi della griglia.
 \[
-    S^{\downarrow}_{i,j}=\max\left\{
-    S^{\downarrow}_{i-1,j}-\sigma,
-    S_{i-1,j}-(\rho+\sigma)
-    \right\},
-\]
-\[
-    S^{\rightarrow}_{i,j}=\max\left\{
-    S^{\rightarrow}_{i,j-1}-\sigma,
-    S_{i,j-1}-(\rho+\sigma)
-    \right\}.
+    w(e) = \begin{cases}
+        1, & \text{arco diagonale corrispondente a un match},\\
+        0, & \text{arco verticale o orizzontale}
+    \end{cases}
 \]
 
-Lo stato principale $(3)$ combina quindi il match/mismatch con i due stati di gap:
+Il problema della LCS può quindi essere ricondotto alla ricerca di un cammino di peso massimo da $(0,0)$ a $(n,m)$ nel DAG associato alla griglia descritta sopra.
+
+Sia $S_{i,j}$ la lunghezza di una LCS tra $v_{1}\cdots v_{i}$ e $w_{1} \cdots w_{j}$.
+Siano $S_{i,0}=0=S_{0,j}$
+
+Allora possiamo così definire la ricorrenza:
 \[
-    S_{i,j}=\max\left\{
-    S_{i-1,j-1}+\delta(v_i,w_j),
-    S^{\downarrow}_{i,j},
-    S^{\rightarrow}_{i,j}
-    \right\}.
+    S_{i,j} = \max \begin{cases}
+        S_{i-1,j}\\
+        S_{i,j-1}\\
+        S_{i-1,j-1} + 1 &\text{se }v_i = w_j
+    \end{cases}
 \]
 
-Avendo definito il sistema di valutazione e di allineamento, possiamo studiarne la complessità
+I primi due termini corrispondono rispettivamente a non utilizzare $v_{i}$ oppure $w_{j}$ nella subsequence comune.
+Se invece $v_{i} = w_{j}$, è possibile utilizzare entrambi i simboli aggiungendo 1 alla soluzione relativa ai prefissi
+precedenti. La struttura della ricorrenza riprende quindi la dipendenza dai tre setteproblemi introddo nella sezione precedente.
 
+Poiché gli stati sono $(n+1)(m+1)$, memorizzare l'intera matrice richiede spazio
+\[
+    O(nm).
+\]
+Poiché ogni stato viene calcolato utilizzando un numero costante di operazioni, anche il tempo di calcolo è
+\[
+    O(nm).
+\]
 
-\subsection{Alignment graph e Manhattan Tourist Problem}
+Se interessa soltanto la lunghezza della LCS, è sufficiente mantenere in memoria le righe necessarie al calcolo,
+riduenco così lo spazio a $O(\min(n,m))$.
+
+\subsection{Alignment graph}
+
+La rappresentazione su grafo introdotta per la LCS può essere generalizzata al problema dell'allineamento di sequenze.
+
+Siano $v$ e $w$ due sequenze, con $|v| = n$ e $|w| = m$.
+Definiamo l'\textbf{alignment graph} come il grafo diretto aciclico i cui nodi sono le coppie
+\[
+    (i,j), \qquad 0 \leq i \leq n, \quad 0 \leq j \leq m,
+\]
+dove il nodo $(i,j)$ rappresenta l'allineamento dei prefissi
+\[
+    v_{1} \cdots v_{i}, \qquad w_{1}\cdots w_{j}.
+\]
+
+Lo stato iniziale è $(0,0)$ e quello finale è $(n,m)$.
+
+Ogni allineamento tra $v$ e $w$ corrisponde a un cammino nell'alignment graph da $(0,0)$ a $(n,m)$ e, viceversa, ogni cammino tra questi nodi 
+rappresenta un possibile allineamento.
+
+Le mosse hanno interpretazione:
+\begin{center}
+    \begin{tabular}{lll}
+        \toprule
+        Mossa & Arco & Operazione nell'allineamento\\
+        \midrule
+        verticale & $(i-1,j)\to(i,j)$ & delezione / $v_i$ contro gap\\
+        orizzontale & $(i,j-1)\to(i,j)$ & inserzione / gap contro $w_j$\\
+        diagonale & $(i-1,j-1)\to(i,j)$ & match o mismatch\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+A ogni mossa è associata, quindi, un arco del grafo. Il peso di ogni arco è definito come segue:
+\[
+    \begin{aligned}
+        w\bigl((i-1,j)\to(i,j)\bigr) &=\delta(v_i,-),\\
+        w\bigl((i,j-1)\to(i,j)\bigr) &=\delta(-,w_j),\\
+        w\bigl((i-1,j-1)\to(i,j)\bigr) &=\delta(v_i,w_j).
+    \end{aligned}
+\]
+
+Il peso di un cammino coincide quindi con lo score dell'allineamento
+corrispondente.
 
 \subsection{Global Alignment Problem}
 
-Delineamo gli obiettivi computazionali che ci guideranno nel percorso:
+Definiamo ora formalmente il problema dell'allineamento globale, che
+costituisce il problema di riferimento per gli algoritmi analizzati nel seguito.
+
+Siano $v$ e $w$ due sequenze e sia $\delta$ la funzione di scoring definita precedentemente.
+
+Dato un allineamento
+\[
+    \mathcal{A}= \begin{pmatrix}
+        x_{1} & x_{2} & \cdots & x_r \\
+        y_{1} & y_{2} & \cdots & y_r
+    \end{pmatrix}
+\]
+costituito da $r$ colonne, definiamo il suo score complessivo come
+\[
+    \operatorname{score}(A) = \sum^{r}_{k=1} \delta(x_{k},y_{k})
+\]
+
+Sia $\mathcal{A}(v,w)$ l'insieme di tutti i possibili allineamenti tra $v$ e $w$.
+Il \textbf{Global Alignment Problem} consiste nel determinare un allineamento di score massimo, ovvero
+\[
+    \operatorname{OPT}(v,w) = \max_{A \in \mathcal{A}(v,w)} \operatorname{score}(A)
+\]
+
+Nel modello di scoring lineare considerato di seguito,
+\[
+    \text{match}= +1,\qquad \text{mismatch}= -\eta,\qquad \text{indel}= -\sigma,
+\]
+con $\eta, \sigma>0$
+
+Lo score di un allineamento può quindi essere espresso come
+\[
+    \operatorname{score}(A) = \# \text{match} - \eta\#\text{mismatch} - \sigma\#\text{gap}.
+\]
+dove $\#\text{gap}$ indica il numero di colonne dell'allineamento contenenti un gap dovuto a una trasformazione indel.
+
+Per quanto osservato nella sezione precedente, ogni allineamento corrisponde a un cammino da $(0,0)$ a $(n,m)$ nell'alignment graph e 
+il peso del cammino coincide con lo score dell'allineamento.
+Il Global Alignment Problem può quindi essere interpretato come la ricerca di un cammino di peso massimo tra questi due nodi.
+    
+Da questa formulazione emergono tre obiettivi computazionali che guideranno l'analisi degli algoritmi successivi:
 \begin{itemize}
-    \item calcolare il valore ottimo;
-    \item ricostruire una soluzione ottima;
-    \item riuscire a farlo utilizzando poca memoria.
+    \item calcolare il valore ottimo $\operatorname{OPT}(v,w)$;
+    \item ricostruire un allineamento che realizzi tale valore;
+    \item ricostruire un allineamento ottimo riducendo l'utilizzo di memoria.
 \end{itemize}
-
-
