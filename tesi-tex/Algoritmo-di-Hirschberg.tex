@@ -1,8 +1,207 @@
 \section{Algoritmo di Hirschberg}
 
-\subsection{Ricorrenza, inizializzazione e traceback}
+Nel capitolo precedente abbiamo osservato che, se siamo interessati soltanto al calcolo
+dello score ottimo del Global Alignment Problem, non è necessario memorizzare
+l'intera matrice della programmazione dinamica. Mantenendo solamente le colonne
+necessarie al calcolo dello stato successivo, lo spazio ausiliario può infatti essere
+ridotto a
+\[
+    \Theta(\min\{n,m\}).
+\]
+
+Questa ottimizzazione, tuttavia, non permette direttamente di ricostruire un
+allineamento ottimo, poiché le informazioni necessarie al traceback vengono
+progressivamente eliminate.
+
+L'obiettivo dell'algoritmo di Hirschberg è mantenere una complessità spaziale
+lineare, ricostruendo comunque un allineamento associato allo score massimo.
+
+Per ottenere questo risultato, Hirschberg combina il calcolo degli score in spazio
+lineare con una strategia \emph{divide et impera} applicata all'alignment graph.
+Consideriamo infatti un cammino ottimo da $(0,0)$ a $(n,m)$. Tale cammino deve
+attraversare la colonna centrale del grafo,
+\[
+    j_{\mathrm{mid}} = \left\lfloor\frac{m}{2}\right\rfloor.
+\]
+
+Se riusciamo quindi a individuare un vertice della colonna $j_{\mathrm{mid}}$
+appartenente ad almeno un cammino ottimo, possiamo suddividere il problema in due
+sottoproblemi: la ricerca di un cammino ottimo dalla sorgente a tale vertice e la
+ricerca di un cammino ottimo dal vertice al sink.
+
+Applicando ricorsivamente questa procedura è possibile ricostruire il cammino
+ottimo senza memorizzare l'intera matrice dei predecessori.
+
+Nella formulazione utilizzata nel seguito, l'algoritmo individua non soltanto un
+vertice centrale, detto \emph{middle vertex}, ma anche un arco ottimo uscente da
+esso, detto \emph{middle edge}. Tale arco permette di determinare una colonna
+dell'allineamento e di separare precisamente i due sottoproblemi ricorsivi.
+
+\subsection{Ricorrenza, Middle vertex e Middle edge}
+
+La ricorrenza utilizzata nell'algoritmo di Hirschberg è la stessa introdotta per Needleman-Wunsch.
+Sia $S_{i,j}$ lo score ottimo dell'allineamento tra i prefissi $v_{1}\cdots v_{n}$ e $w_{1}\cdots w_{m}$.
+Per $i,j>0$ vale quindi
+\[
+    S_{i,j}
+    =
+    \max
+    \begin{cases}
+        S_{i-1,j}+\delta(v_i,-),\\
+        S_{i,j-1}+\delta(-,w_j),\\
+        S_{i-1,j-1}+\delta(v_i,w_j)
+    \end{cases}
+\]
+
+Anche il modello di scoring $\delta$ rimane invariato rispetto
+all'implementazione di Needleman--Wunsch. In questo modo i due algoritmi risolvono
+lo stesso problema di ottimizzazione e possono successivamente essere confrontati
+utilizzando le medesime condizioni sperimentali.
+
+La prima osservazione su cui si basa Hirschberg riguarda il calcolo degli score.
+Per determinare una cella $S_{i,j}$ sono ncessari solamente i valori
+\[
+    S_{i-1,j}, \qquad S_{i,j-1}, \qquad S_{i-1,j-1}.
+\]
+
+Di conseguenza, durante il calcolo della colonna $j$ è sufficiente conservare la colonna precedente e i valori già calcolati della
+colonna corrente.
+
+Senza perdita di generalità, supponiamo $n \leq m$, disponendo quindi la sequenza più corta lungo le righe dell'alignment graph.
+Gli score possono essere memorizzati in due vettori
+\[
+    \texttt{previous}, \qquad \texttt{current}.
+\]
+entrambi contenenti $n+1$ elementi.
+
+Una volta terminato il calcolo di una colonna, i ruoli dei due vettori vengono scambiati: la colonna appena calcolata diventa la 
+colonna precedente utilizzata per determinare quella successiva.
+Non è quindi necessario conservare le colonne già elaborate.
+
+Consideriamo adesso la colonna centrale
+\[
+    j_{\mathrm{mid}}=\left\lfloor \frac{m}{2}\right\rfloor.
+\]
+
+Ogni cammino dalla sorgente $(0,0)$ al pozzo $(n,m)$ attraversa almeno un vertice della colonna $j_{\mathrm{mid}}$.
+Vogliamo determinare quale di questi vertici appartenga ad almeno un cammino ottimo.
+
+Per ogni $i \in \{ 0,\ldots,n \}$ definiamo
+\[
+    \operatorname{prefix}(i) = \operatorname{OPT} \left[(0,0)\rightarrow(i,j_{\mathrm{mid}} \right],
+\]
+ossia lo score del miglior cammino dalla sorgente al vertice $(i,j_{\mathrm{mid}})$.
+
+In maniera analoga, definiamo
+\[
+    \operatorname{suffix}(i) = \operatorname{OPT} \left[(i,j_{\mathrm{mid}}\rightarrow(n,m) \right],
+\]
+ossia lo score del miglior cammino del medesimo vertice al singk
+
+Definiamo quindi
+\[
+    \operatorname{length}(i) = \operatorname{prefix}(i) + \operatorname{suffix}(i).
+\]
+
+La quantità $\operatorname{length}(i)$ rappresenta il massimo score ottenibile tra tutti i cammini dalla sorgente al pozzo vincolati
+a passare attraverso $(i,j_{\mathrm{mid}})$.
+
+Un \emph{middle vertex} può pertanto essere individuato scegliendo
+\[
+    i_{\mathrm{mid}} \in \operatorname*{arg\,max}_{0 \leq i \leq n} \operatorname{length}(i).
+\]
+
+Il vertice
+\[
+    (i_{\mathrm{mid}},j_{\mathrm{mid}})
+\]
+appartiene quindi ad almeno un cammino ottimo.
+
+Infatti, se un cammino attrersa il middle vertex, il suo prefisso fino a tale vertice e il suo suffisso fino al pozzo devono essere ottimi
+per i rispettivi sottoproblemi.
+In caso contrario sarebbe possibile sostituire una delle due parti con un cammino di score maggiore, ottenendo un cammino complessivo
+migliore e contraddicendo l'ottimalità della soluzione.
+
+I valori $\operatorname{prefix}(i)$ possono essere calcolati mediante la programmazione dinamica in spazio lineare descritta precedentemente,
+arrestando il calcolo alla colonna $j_{\mathrm{mid}}$.
+
+Per ottenere $\operatorname{suffix}(i)$ possiamo applicare lo stesso procedimento nel verso opposto.
+Concettualmente, ciò equivale a considerare l'alignment graph con gli archi invertiti e a calcolare il miglior cammino dal pozzo verso la colonna centrale.
+
+Quindi, è sufficiente eseguire la stessa ricorrenza percorrendo le sequenze in ordine inverso, come se avessimo invertito la direzione degli archi.
+
+Una volta determinato il middle vertexe rimane da inviduare quale arco uscente da esso appartenga a un cammino ottimo.
+
+Dal middle vertex possono partire al più tre archi, corrispondenti alle tre operazioni dell'allineamento.
+
+Sia $R(i,j)$ lo score del miglior cammino dal vertice $(i,j)$ al pozzo.
+Sia $e$ l'arco che ha come coda il middle vertex, allora definiamo i tre valori candidati
+\[
+    \begin{aligned}
+        & w(e_{\mathrm{vert}}) = \delta( v_{i}, -) + R(i+1,j),
+        & w(e_{\mathrm{oriz}}) = \delta(-, w_{j}) + R(i,j+1),
+        & w(e_{\mathrm{diag}}) = \delta( v_{i}, w_{j}) + R(i+1,j+1).
+    \end{aligned}
+\]
+Allora, il middle edge viene scelto tra gli archi che massimizzano tali quantità.
+
+Il termine relativo al cammino dalla sorgente al middle vertex non compare nel confronto, poiché è lo stesso per tutti gli archi uscenti da tale vertice.
+E' quindi sufficiente confrontare il peso dell'arco con lo score ottimo del cammino che parte dal suo estremo finale.
+
+Una volta individuato il middle edge, il problema viene suddiviso nei due sottoproblemi posti rispettivamente prima e dopo tale arco.
+
+La ricostruzione dell'allineamento assume quindi la forma
+\[
+    A = A_{\mathrm{left}}\circ e_{\mathrm{mid}}\circ A_{\mathrm{right}},
+\]
+dove $A_{\mathrm{left}}$ e $A_{\mathrm{right}}$ sono gli allineamenti ottenuti ricorsivamente nei due sottoproblemi, mentre 
+$e_{\mathrm{mid}}$ determina una singola colonna dell'allineamento complessivo.
+
+In questo modo Hirschberg non necessita di una matrice globale dei predecessori; le colonne dell'allineamento vengono prodotte
+progressivamente durante la ricorsione.
 
 \subsection{Pseudocodice}
+
+Siamo adesso pronti per realizzare lo pseudocodice per l'algoritmo di Hirschberg.
+
+Iniziamo dal calcolo degli score in spazio lineare
+\begin{lstlisting}[style=pseudo,caption={LinearSpaceNWScore}]
+NWScore(v,w,v_source,v_sink,w_source,w_sink,delta)
+    previous <- inizializzazione della prima colonna
+
+    for j <- 1,...,|w| 
+    // non usiamo m poiché w potrebbe essere una sottosequenza di w originale
+        current[0] = previous[0] + delta('-',w[j])
+        for i <- 1,...,n
+            up       <- current[i-1] + delta(v[i],'-')
+            left     <- previous[i] + delta('-',w[j])
+            diagonal <- previous[i-1] + delta(v[i],w[j])
+            current[i] = max(up,left,diagonal)
+        
+        swap(previous,current)
+
+    return previous
+            
+\end{lstlisting}
+
+Analogalmente, viene definita la funzione \texttt{NWScoreReverse}, che restituisce $\operatorname{suffix}(i)$.
+
+Possiamo passare allo pseudocodice per la funzione che determina il middle edge.
+\begin{lstlisting}[style=pseudo,caption={MiddleEdge}]
+MiddleEdge(top,bottom,suffix,suffix_next,middle_vertex,v,w,delta)
+    if(middle_vertex.i == bottom) then
+        middle_edge.dir = HORIZONTAL
+        return middle_edge
+
+    next_down = suffix[i+1] + delta(v[middle_vertex.i,'-'])
+    next_right = suffix_next[i] + delta('-',w[middle_vertex.j])
+    next_diagonal = suffix_next[i+1] + delta(v[middle_vertex.i],w[middle_vertex.j])
+    middle_edge.score = max(next_down,next_right,next_diagonal)
+
+    return middle_edge
+\end{lstlisting}
+
+
 
 \subsection{Analisi della complessità}
 
