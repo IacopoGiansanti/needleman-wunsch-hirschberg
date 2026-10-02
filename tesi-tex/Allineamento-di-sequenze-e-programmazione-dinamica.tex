@@ -1,24 +1,22 @@
-\section{Definizione del Global Alignment problem e dei prerequisiti essenziali}
+\section{Definizione del Global Alignment Problem e dei prerequisiti essenziali}
 
 \subsection{Rappresentazione delle sequenze biologiche}
 
 Il DNA è costituito da quattro tipi di nucleotidi, caratterizzati dalle seguenti basi azotate:
 \begin{itemize}
-    \item Adenina, $A$;
-    \item Citosina, $C$;
-    \item Guanina, $G$;
-    \item Timina, $T$.
+    \item Adenina, \tt{A};
+    \item Citosina, \tt{C};
+    \item Guanina, \tt{G};
+    \item Timina, \tt{T}.
 \end{itemize}
 I due filamenti della molecola sono complementari e antiparalleli, con appaiamenti
 \[
-\begin{matrix}
-    A \longleftrightarrow T & , & C\longleftrightarrow G
-\end{matrix}
+    A \longleftrightarrow T, \qquad C \longleftrightarrow G
 \]
 
 Dal punto di vista computazionale, un singolo filamento può essere rappresentato come una stringa sull'alfabeto
 \[
-    \Sigma_{\text{DNA}} = \{A,C,G,T\}.
+    \Sigma_{\text{DNA}} = \{\tt{A},\tt{C},\tt{G},\tt{T}\}
 \]
 
 Quindi una stringa di lunghezza $n$ ha forma
@@ -26,29 +24,34 @@ Quindi una stringa di lunghezza $n$ ha forma
     x=x_1x_2\cdots x_n,\qquad x_i\in\Sigma_{\text{DNA}}\qquad \forall i \in\{1,\ldots,n\}.
 \]
 
-Una \emph{substring} è una porzione contigua di una stringa. Data una stringa di lunghezza $n$ esiste una substring di lunghezza $k$ per $k\leq n$.
+Una \emph{sottostringa} è una porzione contigua di una stringa, della forma
+\[
+    x_{i} x_{i+1} \cdots  x_{j},
+\]
+con $0 \leq i \leq j \leq n$, e $n$ la lunghezza della stringa originale.
+In una stringa di lunghezza $n$, una sottostringa di lunghezza $k$ esiste per $k \leq n$.
 
-Un \emph{$k$-mero} è una substring di lunghezza $k\geq1$.
+Un \emph{$k$-mero} è una sottostringa di lunghezza $k\geq1$.
 
-Una \emph{subsequence} è invece una nuova stringa ottenuta eliminando 0 o più elementi della stringa originale mantenendone l'ordine relativo.
+Data una stringa, una \emph{sottosequenza} è invece una stringa ottenuta eliminando 0 o più elementi dalla stringa originale mantenendone l'ordine relativo.
 
 Mostriamo un esempio: sia $s$ una stringa che rappresenta una sequenza genomica,
 \[
     s:= \texttt{ACCT},
 \]
-allora $\texttt{AC}$ può essere sia una substring che una subsequence, mentre $\texttt{AT}$ è definibile soltanto come subsequence.
+allora $\texttt{AC}$ può essere sia una sottostringa che una sottosequenza, mentre $\texttt{AT}$ è definibile soltanto come sottosequenza.
 
 Due sequenze genomiche omologhe possono differire tra loro a causa di mutazioni. Consideriamo tre eventi possibili associati a tali mutazioni:
 
 \[
 \begin{array}{r c l}
     \texttt{AC}  & \xrightarrow{\text{sostituzione}} & \texttt{AA} \\
-    \texttt{AC}  & \xrightarrow{\text{inserzione}}   & \texttt{AAC} \\ 
-    \texttt{AAC} & \xrightarrow{\text{delezione}}    & \texttt{AC}
+    \texttt{AC}  & \xrightarrow{\text{inserimento}}   & \texttt{AAC} \\ 
+    \texttt{AAC} & \xrightarrow{\text{cancellazione}}    & \texttt{AC}
 \end{array}
 \]
 
-Gli ultimi due eventi verranno ogni tanto trattati come appartenenti a un unico tipo, dal nome \emph{indel}.
+Gli ultimi due eventi verranno talvolta trattati come appartenenti a un unico tipo, dal nome \emph{indel}.
 
 Supponiamo, quindi, di avere due sequenze genomiche omologhe che differiscono a causa di mutazioni genetiche; come possiamo quantificare e
 individuare la somiglianza tra le due sequenze?
@@ -68,34 +71,37 @@ inoltre alterare la corrispondenza tra le posizioni delle due sequenze.
 
 Abbiamo quindi bisogno di una misura più generale.
 Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni elementari
-di inserzione, delezione e sostituzione necessarie per trasformare una sequenza $v$ in una sequenza $w$.
+di inserimento, cancellazione e sostituzione necessarie per trasformare una sequenza $v$ in una sequenza $w$.
 
 L'edit distance fornisce una misura della dissimilarità tra due sequenze. Per rappresentare esplicitamente le corrispondenze tra i loro simboli
 introduciamo ora il concetto di \textbf{allineamento}.
 
 Siano $v$ e $w$ due sequenze. Un allineamento di $v$ e $w$ è una matrice 
 \[
-    \mathcal{A}\in(\Sigma_{\text{DNA}}\cup \{ - \})^{2\times L},
+    A\in(\Sigma_{\text{DNA}}\cup \{ - \})^{2\times L},
 \]
 con,
 \[
     \max \{ |v|,|w| \}\leq L \leq |v| + |w|,
 \]
-tale che, eliminando i simboli di gap dalla prima riga, si ottiene $v$, mentre eliminandoli dalla seconda si ottiene $w$.
+tale che, eliminando i simboli di gap (' \texttt{-} ') dalla prima riga, si ottiene $v$, mentre eliminandoli dalla seconda si ottiene $w$.
 Non sono ammesse colonne contenenti due gap.
 
 Ogni colonna di un allineamento corrisponde a uno dei seguenti casi:
 \begin{itemize}
-    \item match;
+    \item match (corrispondenza);
     \item mismatch (sostituzione);
-    \item inserzione;
-    \item delezione;
+    \item inserimento;
+    \item cancellazione;
 \end{itemize}
 
-Visualizziamo cosa è stato appena detto: siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate e $\mathcal{A}$ il loro allineamento, allora, \[ \begin{matrix}
-        v_{\text{aligned}} & : & A & C & T & - & G & C & A \\
-        w_{\text{aligned}} & : & A & - & T & C & G & C & A
-    \end{matrix}\enspace = \enspace\mathcal{A}
+Visualizziamo cosa è stato appena detto: siano $v_{aligned}$ e $w_{aligned}$ le sequenze allineate e $A$ il loro allineamento,
+allora un esempio potrebbe essere:
+\[
+    \begin{matrix}
+        v_{\text{aligned}} & : & \texttt{A} & \texttt{C} & \texttt{T} & \texttt{-} & \texttt{G} & \texttt{C} & \texttt{A} \\
+        w_{\text{aligned}} & : & \texttt{A} & \texttt{-} & \texttt{T} & \texttt{C} & \texttt{G} & \texttt{C} & \texttt{A} 
+    \end{matrix}\enspace = \enspace A
 \]
 
 Per valutare la similarità tra simboli introduciamo una funzione di \textbf{scoring},
@@ -109,7 +115,7 @@ Una funzione di scoring (anche detta modello) per una sequenza di DNA è general
 \[
     \delta(a,b)=
     \begin{cases}
-        +\mu, & a=b, \qquad a,b \in \Sigma_{\text{DNA}} \\
+        \mu, & a=b, \qquad a,b \in \Sigma_{\text{DNA}} \\
         -\eta, & a\neq b, \qquad a,b \in \Sigma_{\text{DNA}}\\
         -\sigma, & \text{se esattamente uno tra }a, b \text{ è un gap}
     \end{cases}
@@ -120,34 +126,36 @@ Il modello in cui mismatch e gap hanno la stessa penalità si ottiene come caso 
 Grazie alla funzione di scoring possiamo anche definire la \textbf{scoring matrix}, 
 \[
     \begin{array}{c|ccccc}
-    \delta & A & C & G & T & -\\
+    \delta & \texttt{A} & \texttt{C} & \texttt{G} & \texttt{T} & \texttt{-}\\
     \hline
-    A & +\mu & -\eta & -\eta & -\eta & -\sigma\\
-    C & -\eta & +\mu & -\eta & -\eta & -\sigma\\
-    G & -\eta & -\eta & +\mu & -\eta & -\sigma\\
-    T & -\eta & -\eta & -\eta & +\mu & -\sigma\\
-    - & -\sigma & -\sigma & -\sigma & -\sigma & \text{n.a.}
+    \texttt{A} & \mu & -\eta & -\eta & -\eta & -\sigma\\
+    \texttt{C} & -\eta & \mu & -\eta & -\eta & -\sigma\\
+    \texttt{G} & -\eta & -\eta & \mu & -\eta & -\sigma\\
+    \texttt{T} & -\eta & -\eta & -\eta & \mu & -\sigma\\
+    \texttt{-} & -\sigma & -\sigma & -\sigma & -\sigma & \text{n.a.}
     \end{array}
 \]
 
-Siano $x,y$ le sequenze allineate corrispondenti rispettivamente a $v$ e $w$,\\
+Siano $x,y$ le sequenze allineate corrispondenti rispettivamente a due stringhe $v$ e $w$,
 quindi $x_{i},y_{i}\in \Sigma_{\text{DNA}} \cup \{ - \}$, $\forall i \in \{ 1,\ldots,L \}$.
 
-Sia
+Sia la matrice di allineamento
 \[
-    \mathcal{A} = \begin{pmatrix}
+    A = \begin{pmatrix}
         x_{1} & \cdots & x_{L} \\
         y_{1} & \cdots & y_{L}
     \end{pmatrix},
 \]
 allora, definiamo lo score complessivo dell'allineamento come
 \[
-    \text{score}(\mathcal{A}) = \sum^L_{i=1} \delta(x_i,y_i).
+    \text{score}(A) = \sum^L_{i=1} \delta(x_i,y_i).
 \]
 
+Il \emph{problema dell'allineamento globale} (Global Alignment Problem) consiste nel trovare, date due sequenze, un allineamento di score massimo.
+
 Nel modello precedente ogni gap viene penalizzato indipendentemente.
-Una successione di gap consecutivi può tuttavia essere interpretata come risultato di un unico evento di inserzione o delezione.
-Per questo motivo vengono spesso utilizzate penalità affini, che distinguono il costo di apertura di un gap da quelo della sua estensione.
+Una successione di gap consecutivi può tuttavia essere interpretata come risultato di un unico evento di inserimento o cancellazione.
+Per questo motivo vengono spesso utilizzate penalità affini, che distinguono il costo di apertura di un gap da quello della sua estensione.
 Tale generalizzazione richiede stati aggiuntivi nella programmazione dinamica; nel seguito ci concentreremo tuttavia sul modello a penalità
 lineare utilizzato dagli algoritmi oggetto del confronto.
 
@@ -155,10 +163,10 @@ lineare utilizzato dagli algoritmi oggetto del confronto.
 
 La \emph{programmazione dinamica} è una tecnica algoritmica adatta a problemi caratterizzati da sottoproblemi sovrapposti
 e da una proprietà di sottostruttura ottima.
-I risultati dei sottoproblemi vengono memorizzati, evitando di calcolarli più volte.
+Le soluzioni dei sottoproblemi vengono memorizzati, evitando di calcolarli più volte.
 
 Nel problema di allineamento che considereremo, i sottoproblemi possono essere indicizzati mediante due indici $i$ e $j$.
-In particolare, una ricorrenza avrà tipicamente forma
+In particolare, una ricorrenza avrà tipicamente la forma
 \[
     P(i,j) =
     F\bigl(P(i-1,j),P(i,j-1),P(i-1,j-1)\bigr).
@@ -170,7 +178,7 @@ Siano $|v| = n$ e $|w| = m$. Indicheremo con
 \]
 il valore ottimo relativo ai prefissi
 \[
-     v_{1}\cdots v_{i} \qquad \text{e} w_{1} \cdots w_{j},
+     v_{1}\cdots v_{i} \qquad \text{e}\qquad w_{1} \cdots w_{j},
 \]
 con $0 \leq i \leq n$ e $0 \leq j \leq m$
 
@@ -178,17 +186,17 @@ Nel caso dell'allineamento di sequenze, lo stato $S_{i,j}$ dipenderà dai tre st
 \[
     S_{i-1,j},\qquad S_{i,j-1},\qquad S_{i-1,j-1},
 \]
-che corrisponderanno rispettivamente a una delezione, un'inserzione e a un match o mismatch.
+che corrisponderanno rispettivamente a una cancellazione, un'inserimento e a un match o mismatch.
 
 Memorizzando esplicitamente tutti gli stati
-è necessaria una matrice di $(n+1)(m+1)$ elementi, e quindi uno spazio $O(nm)$
+è necessaria una matrice di $(n+1) \times(m+1)$ elementi, e quindi uno spazio $O(nm)$.
 
 Una volta calcolato il valore ottimo, una soluzione corrispondente può essere ricostruita memorizzando le scelte effettuate
 e percorrendole a ritroso mediante \emph{traceback} 
 
 \subsection{Longest Common Subsequence}
 
-Una \emph{common subsequence} di due stringhe $v$ e $w$ è una stringa che è una subsequence sia di $v$ sia di $w$.
+Una \emph{sottosequenza comune} a due stringhe $v$ e $w$ è una stringa che è una sottosequenza sia di $v$ sia di $w$.
 
 Quindi, siano
 \[
@@ -198,7 +206,7 @@ Una stringa
 \[
     z =z_{1}z_{2} \cdots z_{k}
 \]
-è una common subsequence di $v$ e $w$ se esistono indici
+è una sottosequenza comune a $v$ e $w$ se esistono indici
 \[
     1 \leq i_{1} < i_{2} < \cdots < i_{k} \leq n
 \]
@@ -221,27 +229,27 @@ Allora, la stringa
 \[
     z= \texttt{ACT}
 \]
-è una common subsequence.
+è una sottosequenza comune.
 
-Tra tutte le common subsequence di $v$ e $w$, siamo interessati a quella di lunghezza massima, detta \textbf{Longest Common Subsequence} (LCS).
+Tra tutte le sottosequenze comuni a $v$ e $w$, siamo interessati ad una di lunghezza massima, detta \textbf{Longest Common Subsequence} (LCS).
 
 Indichiamo con $s(v,w)$ la lunghezza di una LCS tra $v$ e $w$:
 \[
-    s(v,w) =  \max \{ |z|:z \text{ è una common subsequence di }v \text{ e }w \}
+    s(v,w) =  \max \{ |z|:z \text{ è una common sottosequenza di }v \text{ e }w \}
 \]
 
 Considerando una variante dell'edit distance in cui sono ammesse soltanto inserzioni e delezioni, trasformare $v$ in $w$
-utilizzando una common subsequence di lunghezza $k$ richiede
+utilizzando una common sottosequenza di lunghezza $k$ richiede
 \[
     (n-k) + (m-k)
 \]
-operazioni. Per una LCS, con $k=s(v,w)$, si ottiene quindi 
+operazioni. Per una LCS, con $k=s(v,w)$, si ottiene quindi tale distanza come
 \[
     d_{\text{indel}}(v,w) = n + m - 2s(v,w)
 \]
 
-Il problema della LCS può quindi essere ricondotto alla ricerca di un cammino di peso massimo
-da $(0,0)$ a $(n,m)$.
+Il problema della LCS può essere ricondotto alla ricerca di un cammino di peso massimo
+da $(0,0)$ a $(n,m)$ su un digrafo aciclico definito in modo appropriato come segue.
 
 A ogni coppia di prefissi
 \[
@@ -249,16 +257,16 @@ A ogni coppia di prefissi
 \]
 associamo un nodo $(i,j)$.
 
-Da ogni nodo sono possibili tre tipi di movimento:
+Ogni nodo $(i,j)$ può avere tre tipi di archi entranti:
 \begin{itemize}
-    \item $(i-1,j)\rightarrow(i,j)$;
-    \item $(i,j-1)\rightarrow(i,j)$;
-    \item $(i-1,j-1)\rightarrow(i,j)$, soltanto quando $v_i=w_j$.
+    \item $(i-1,j)\rightarrow(i,j)$ (arco 'verticale', corrispondente all'omissione di un simbolo di $v$);
+    \item $(i,j-1)\rightarrow(i,j)$ (arco 'orizzontale', corrispondente all'omissione di un simbolo di $w$);
+    \item $(i-1,j-1)\rightarrow(i,j)$, soltanto quando $v_i=w_j$ (arco 'diagonale', corrispondentea un match).
 \end{itemize}
 
-Nel problema della LCS assegniamo un peso a ogni arco, $w(e)$, dove $e \in E$, con $E$ insieme degli archi della griglia.
+Nel problema della LCS assegniamo un peso a ogni arco, $c(e)$, dove $e \in E$, con $E$ insieme degli archi della griglia.
 \[
-    w(e) = \begin{cases}
+    c(e) = \begin{cases}
         1, & \text{arco diagonale corrispondente a un match},\\
         0, & \text{arco verticale o orizzontale}
     \end{cases}
@@ -272,8 +280,7 @@ Siano
     S_{i,0} = 0, \qquad S_{0,j} = 0.
 \]
 
-
-Allora possiamo così definire la ricorrenza:
+Allora vale la ricorrenza:
 \[
     S_{i,j} = \max \begin{cases}
         S_{i-1,j}\\
@@ -282,11 +289,11 @@ Allora possiamo così definire la ricorrenza:
     \end{cases}
 \]
 
-I primi due termini corrispondono rispettivamente a non utilizzare $v_{i}$ oppure $w_{j}$ nella subsequence comune.
+I primi due termini corrispondono rispettivamente a non utilizzare $v_{i}$ oppure $w_{j}$ nella sottosequenza comune.
 Se invece $v_{i} = w_{j}$, è possibile utilizzare entrambi i simboli aggiungendo 1 alla soluzione relativa ai prefissi
 precedenti. La struttura della ricorrenza riprende quindi la dipendenza dai tre sottoproblemi introdotti nella sezione precedente.
 
-Poiché gli stati sono $(n+1)(m+1)$, memorizzare l'intera matrice richiede spazio
+Poiché gli stati sono $(n+1) \times(m+1)$, memorizzare l'intera matrice richiede spazio
 \[
     O(nm).
 \]
@@ -300,7 +307,7 @@ riducendo così lo spazio a $O(\min(n,m))$.
 
 \subsection{Alignment graph}
 
-La rappresentazione su grafo introdotta per la LCS può essere generalizzata al problema dell'allineamento di sequenze.
+La rappresentazione tramite grafo introdotta per la LCS può essere generalizzata al problema dell'allineamento di sequenze.
 
 Siano $v$ e $w$ due sequenze, con $|v| = n$ e $|w| = m$.
 Definiamo l'\textbf{alignment graph} come il grafo diretto aciclico i cui nodi sono le coppie
@@ -309,28 +316,35 @@ Definiamo l'\textbf{alignment graph} come il grafo diretto aciclico i cui nodi s
 \]
 dove il nodo $(i,j)$ rappresenta l'allineamento dei prefissi
 \[
-    v_{1} \cdots v_{i}, \qquad w_{1}\cdots w_{j}.
+    v_{1} \cdots v_{i}, \qquad w_{1}\cdots w_{j},
 \]
+e i cui archi sono definiti come segue:
+\begin{center}
+    \begin{tabular}{lll}
+        \toprule
+        Direzione & Arco & Operazione nell'allineamento\\
+        \midrule
+        verticale & $(i-1,j)\to(i,j)$ & cancellazione / $v_i$ contro gap\\
+        orizzontale & $(i,j-1)\to(i,j)$ & inserimento / gap contro $w_j$\\
+        diagonale & $(i-1,j-1)\to(i,j)$ & match o mismatch\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+%   Siano $v$ e $w$ due sequenze, con $n:=|v|$ e $m:=|w|$.
+%   Definiamo l'\emph{alignment graph} come il grafo diretto aciclico $G=(V,E)$,
+%   dove l'insieme dei vertici è 
+%   \[
+%       V:= \{ (i,j)\mid 0 \leq i \leq n,\; 0 \leq j \leq m \},
+%   \]
+%   e gli archi in $E$ sono definiti come segue:
 
 Lo stato iniziale è $(0,0)$ e quello finale è $(n,m)$.
 
 Ogni allineamento tra $v$ e $w$ corrisponde a un cammino nell'alignment graph da $(0,0)$ a $(n,m)$ e, viceversa, ogni cammino tra questi nodi 
 rappresenta un possibile allineamento.
 
-Le mosse hanno interpretazione:
-\begin{center}
-    \begin{tabular}{lll}
-        \toprule
-        Mossa & Arco & Operazione nell'allineamento\\
-        \midrule
-        verticale & $(i-1,j)\to(i,j)$ & delezione / $v_i$ contro gap\\
-        orizzontale & $(i,j-1)\to(i,j)$ & inserzione / gap contro $w_j$\\
-        diagonale & $(i-1,j-1)\to(i,j)$ & match o mismatch\\
-        \bottomrule
-    \end{tabular}
-\end{center}
-
-A ogni mossa è associata, quindi, un arco del grafo. Il peso di ogni arco è definito come segue:
+Il peso di ogni arco è definito come segue:
 \[
     \begin{aligned}
         w\bigl((i-1,j)\to(i,j)\bigr) &=\delta(v_i,-),\\
@@ -338,7 +352,7 @@ A ogni mossa è associata, quindi, un arco del grafo. Il peso di ogni arco è de
         w\bigl((i-1,j-1)\to(i,j)\bigr) &=\delta(v_i,w_j),
     \end{aligned}
 \]
-con $\delta$ funzione di scoring.
+con $\delta$ la funzione di scoring.
 
 Il peso di un cammino coincide quindi con lo score dell'allineamento
 corrispondente.

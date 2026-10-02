@@ -1,7 +1,7 @@
 \section{Algoritmo di Hirschberg}
 
 Nel capitolo precedente abbiamo osservato che, se siamo interessati soltanto al calcolo
-dello score ottimo del Global Alignment Problem, non è necessario memorizzare
+dello score ottimo del problema dell'allineamento globale, non è necessario memorizzare
 l'intera matrice della programmazione dinamica. Mantenendo solamente le colonne
 necessarie al calcolo dello stato successivo, lo spazio ausiliario può infatti essere
 ridotto a
@@ -88,13 +88,13 @@ Vogliamo determinare quale di questi vertici appartenga ad almeno un cammino ott
 
 Per ogni $i \in \{ 0,\ldots,n \}$ definiamo
 \[
-    \operatorname{prefix}(i) = \operatorname{OPT} \left[(0,0)\rightarrow(i,j_{\mathrm{mid}} \right],
+    \operatorname{prefix}(i) = \operatorname{OPT} \left[(0,0)\rightarrow(i,j_{\mathrm{mid}}) \right],
 \]
 ossia lo score del miglior cammino dalla sorgente al vertice $(i,j_{\mathrm{mid}})$.
 
 In maniera analoga, definiamo
 \[
-    \operatorname{suffix}(i) = \operatorname{OPT} \left[(i,j_{\mathrm{mid}}\rightarrow(n,m) \right],
+    \operatorname{suffix}(i) = \operatorname{OPT} \left[(i,j_{\mathrm{mid}})\rightarrow(n,m) \right],
 \]
 ossia lo score del miglior cammino del medesimo vertice al singk
 

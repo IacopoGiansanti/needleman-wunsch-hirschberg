@@ -1,5 +1,8 @@
 \section{Algoritmo di Needleman-Wunsch}
 
+In questo capitolo analizzeremo l'algoritmo di Needleman-Wunsch, che è un algoritmo di programmazione dinamica per il problema
+dell'allineamento globale di sequenze.
+
 \subsection{Ricorrenza, inizializzazione e traceback}
 
 Sia $S_{i,j}$ il miglior score globale tra $v_{1}\cdots v_{i}$ e $w_{1} \cdots w_{j}$, con $0 \leq i \leq n, 0 \leq j \leq m$.
@@ -16,7 +19,7 @@ Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilit�
             \end{pmatrix}
         \]
         quindi prima di essa è stato allineato $v_{1}\cdots v_{i-1}$ con $w_{1}\cdots w_{j}$.\\
-        Il contributo è
+        Lo score in questo caso è 
         \[
             S_{i-1,j} + \delta(v_{i},-)
         \]
@@ -29,7 +32,7 @@ Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilit�
             \end{pmatrix}
         \]
         quindi prima di essa è stato allineato $v_{1}\cdots v_{i}$ con $w_{1}\cdots w_{j-1}$.\\
-        Il contributo è
+        Lo score in questo caso è 
         \[
             S_{i,j-1} + \delta(-,w_{j})
         \]
@@ -42,14 +45,14 @@ Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilit�
             \end{pmatrix}
         \]
         quindi prima di essa è stato allineato $v_{1}\cdots v_{i-1}$ con $w_{1}\cdots w_{j-1}$.\\
-        Il contributo è
+        Lo score in questo caso è
         \[
             S_{i-1,j-1} + \delta(v_{i},w_{j})
         \]       
 \end{itemize}
 
 Per gli stati interni dell'allineamento, con $1 \leq i \leq n$ e $1 \leq j \leq m$, possiamo formulare la ricorrenza a partire dai tre possibili predecessori.
-Prima però è necessario inizializzare gli stati sul bordo della matrice, che corrispondono con i casi base del problema dell'allineamento globale:
+Prima però è necessario inizializzare gli stati sul bordo della matrice, che corrispondono ai casi base del problema dell'allineamento globale:
 \[
     \begin{aligned}
         S_{0,0}&=0; \\
@@ -106,15 +109,15 @@ A ciascuna direzione memorizzata in $B_{i,j}$ corrisponde una colonna dell'allin
 \]
 
 Così facendo, partendo da $(n,m)$ possiamo ricostruire l'allineamento percorrendo i predecessori fino a $(0,0)$.
-Notiamo però che tramite il \emph{backtracking} le colonne vengono generate in ordine contrario, quindi al termine vanno invertite.
+Notiamo però che tramite questo processo di \emph{traceback} le colonne vengono generate in ordine contrario, quindi al termine vanno invertite.
 
-In caso di parità tra più transizioni esistono più cammini, e quindi potenzialmente più allineamenti ottimi.
+In caso di parità tra più direzioni esistono più cammini equivalenti, e quindi potenzialmente più allineamenti ottimi.
 Se l'obiettivo è ricostruire un singolo allineamento ottimo, è sufficiente adottare una regola deterministica di tie-breaking;
 per rappresentare tutti gli allineamenti ottimi sarebbe invece necessario conservare tutti i predecessori che realizzano il massimo.
 
 \subsection{Pseudocodice}
 
-Possiamo adesso scrivere lo pseudocodice per l'algoritmo di Needleman-Wunsch.
+Possiamo adesso fornire lo pseudocodice per l'algoritmo di Needleman-Wunsch.
 
 \begin{lstlisting}[style=pseudo,caption={Global Alignment}]
 NeedlemanWunsch(v,w,delta)
@@ -145,8 +148,8 @@ NeedlemanWunsch(v,w,delta)
     return (S[n,m] , alignment)
 \end{lstlisting}
 
-Adottiamo una politica deterministica di tie-breaking che assegna priorità, nell'ordine, allo spostamento diagnoale, verticale e orizzontale.
-Possiamo quindi scrivere lo pseudocodice del traceback in questa maniera.
+Adottiamo una politica deterministica di tie-breaking che assegna priorità, nell'ordine, allo spostamento diagonale, verticale e orizzontale.
+Il seguente è un possibile pseudocodice del traceback.
 
 \begin{lstlisting}[style=pseudo,caption={Ricostruzione dell'allineamento tramite traceback}]
 Backtrack(B,v,w,i,j)
@@ -191,7 +194,7 @@ Allora,
 \[
     T(n,m) = \Theta(nm),
 \]
-poiché la matrice contiene $(n+1)(m+1)$ stati e ciascuno viene calcolato mediante un numero costante di operazioni.
+poiché la matrice contiene $(n+1) \times(m+1)$ stati e ciascuno viene calcolato mediante un numero costante di operazioni.
 
 Memorizzando l'intera matrice avremo
 \[
