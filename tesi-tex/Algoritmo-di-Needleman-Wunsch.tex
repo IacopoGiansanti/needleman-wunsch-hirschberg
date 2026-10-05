@@ -115,6 +115,39 @@ In caso di parità tra più direzioni esistono più cammini equivalenti, e quind
 Se l'obiettivo è ricostruire un singolo allineamento ottimo, è sufficiente adottare una regola deterministica di tie-breaking;
 per rappresentare tutti gli allineamenti ottimi sarebbe invece necessario conservare tutti i predecessori che realizzano il massimo.
 
+Mostriamo un esempio.
+Siano $v:=\texttt{ACCT}$ e $w:=\texttt{ACT}$ due sequenze.
+Sia $\delta(a,b)$ la funzione di scoring definita in modo tale che restituisca $1$ in caso di match e $-1$ altrimenti.
+Allora la matrice degli score è:
+\[
+    \begin{array}{c|rrrr}
+           & \texttt{-} & \texttt{A} & \texttt{C} & \texttt{T}\\
+        \hline
+        \texttt{-} & 0  & -1 & -2 & -3\\
+        \texttt{A} & -1 & 1  & 0  & -1\\
+        \texttt{C} & -2 & 0  & 2  & 1\\
+        \texttt{C} & -3 & -1 & 1  & 1\\
+        \texttt{T} & -4 & -2 & 0  & 2
+    \end{array}
+\]
+Quindi,
+\[
+    S_{4,3} = 2
+\]
+
+Il traceback sarà:
+\[
+    (4,3) \to (3,2) \to (2,2) \to (1,1) \to (0,0),
+\]
+ricostruendo
+\[
+    \begin{matrix}
+        \texttt{A} & \texttt{C} & \texttt{C} & \texttt{T} \\
+        \texttt{A} & \texttt{C} & \texttt{-} & \texttt{T}
+    \end{matrix}
+\]
+
+
 \subsection{Pseudocodice}
 
 Possiamo adesso fornire lo pseudocodice per l'algoritmo di Needleman-Wunsch.
@@ -207,9 +240,9 @@ La crescita quadratica dello spazio può quindi diventare un limite per sequenze
 una quantità di memoria proporzionale al prodotto delle lunghezze delle due sequenze.
 
 Inoltre, non abbiamo ancora considerato il costo del traceback.
-Un cammino da $(n,m)$ a $(0,0)$ contiene al più $n+m$ archi, quindi, il traceback percorre al massimo $n+m$ celle, richiedendo tempo
+Un cammino da $(n,m)$ a $(0,0)$ contiene al più $n+m$ archi, quindi il traceback percorre al massimo $n+m$ celle, richiedendo tempo
 \[
-    T_{\text{traceback}}(n,m) = O(n+m),
+    T_{\text{traceback}}(n,m) = O(n+m).
 \]
 Inoltre, l'allineamento prodotto può contenere al massimo $n+m$ colonne, e richiede quindi
 \[
@@ -234,9 +267,9 @@ abbiamo bisogno di
 \[
     S_{i-1,j}, \qquad S_{i,j-1}, \qquad S_{i-1,j-1}.
 \]
-Allora, non è difficile notare come il calcolo della colonna $j$ richiede soltanto la colonna $j-1$ e i valori già calcolati della colonna $j$.
+Allora, possiamo notare come il calcolo della colonna $j$ richieda soltanto la colonna $j-1$ e i valori già calcolati della colonna $j$.
 Quindi, se riduciamo il problema soltanto al calcolo del punteggio ottimo, potremmo diminuire lo spazio necessario, andando ad usare soltanto
-due vettori di $n+1$ o $m+1$ elementi, scegliendo opportunatamente la sequenza più corta, ottenendo quindi uno spazio lineare.
+due vettori di $n+1$ o $m+1$ elementi, scegliendo opportunamente la sequenza più corta, ottenendo quindi uno spazio lineare.
 \[
     S_{\text{score}}(n,m) = \Theta\bigl(\min \{ n,m \}\bigr).
 \]
@@ -272,7 +305,7 @@ La funzione associata all'algoritmo di Needleman-Wunsch restituisce un oggetto d
 formato da due sequenze, \texttt{Strand}, e da un intero, \texttt{score}, che corrisponde a $S_{n,m}$.
 
 Poiché nella formulazione teorica le sequenze sono indicizzate a partire da 1, mentre gli array C partono da 0, al simbolo $v_{i}$ corrisponde
-nel codice \texttt{v->bases[i-1]}, e analogamente $w_{j}$ corrisponde a \texttt{w->bases[j]}.
+nel codice \texttt{v->bases[i-1]}, e analogamente $w_{j}$ corrisponde a \texttt{w->bases[j-1]}.
 
 %   Il modello di scoring è rappresentato mediante una struttura contenente i tre parametri associati a match, mismatch e gap.
 %   \[
@@ -293,7 +326,7 @@ La funzione
 \[
     \texttt{scoring(a,b,model)}
 \]
-implementa la funzione di scoring teorica $\delta(a,b)$
+implementa la funzione di scoring teorica $\delta(a,b)$.
 
 L'implementazione alloca due matrici, \texttt{score} e \texttt{pred}, entrambe di dimensione $(n+1) \times (m+1)$.
 La prima memorizza gli score $S_{i,j}$ associati agli stati della programmazione dinamica, mentre la seconda memorizza le informazioni relative ai predecessori. 
@@ -331,7 +364,7 @@ A differenza dello pseudocodice della sezione 3.2, la scelta del predecessore no
 In caso di parità, tutte le direzioni che realizzano il massimo vengono memorizzate in \texttt{pred[i][j]} mediante una bitmask.
 L'operatore OR bit a bit consente infatti di aggiungere un flag senza eliminare quelli già presenti.
 
-La selezione di un signolo predecessore avviene soltanto durante il traceback, secondo la politica deterministica
+La selezione di un singolo predecessore avviene soltanto durante il traceback, secondo la politica deterministica
 \[
     \texttt{DIAGONAL} \succ \texttt{UP} \succ \texttt{LEFT}.
 \]

@@ -28,7 +28,7 @@ Una \emph{sottostringa} è una porzione contigua di una stringa, della forma
 \[
     x_{i} x_{i+1} \cdots  x_{j},
 \]
-con $0 \leq i \leq j \leq n$, e $n$ la lunghezza della stringa originale.
+con $1 \leq i \leq j \leq n$, e $n$ la lunghezza della stringa originale.
 In una stringa di lunghezza $n$, una sottostringa di lunghezza $k$ esiste per $k \leq n$.
 
 Un \emph{$k$-mero} è una sottostringa di lunghezza $k\geq1$.
@@ -80,7 +80,7 @@ Siano $v$ e $w$ due sequenze. Un allineamento di $v$ e $w$ è una matrice
 \[
     A\in(\Sigma_{\text{DNA}}\cup \{ - \})^{2\times L},
 \]
-con,
+con
 \[
     \max \{ |v|,|w| \}\leq L \leq |v| + |w|,
 \]
@@ -163,7 +163,7 @@ lineare utilizzato dagli algoritmi oggetto del confronto.
 
 La \emph{programmazione dinamica} è una tecnica algoritmica adatta a problemi caratterizzati da sottoproblemi sovrapposti
 e da una proprietà di sottostruttura ottima.
-Le soluzioni dei sottoproblemi vengono memorizzati, evitando di calcolarli più volte.
+Le soluzioni dei sottoproblemi vengono memorizzate, evitando di calcolarli più volte.
 
 Nel problema di allineamento che considereremo, i sottoproblemi possono essere indicizzati mediante due indici $i$ e $j$.
 In particolare, una ricorrenza avrà tipicamente la forma
@@ -180,19 +180,19 @@ il valore ottimo relativo ai prefissi
 \[
      v_{1}\cdots v_{i} \qquad \text{e}\qquad w_{1} \cdots w_{j},
 \]
-con $0 \leq i \leq n$ e $0 \leq j \leq m$
+con $0 \leq i \leq n$ e $0 \leq j \leq m$.
 
 Nel caso dell'allineamento di sequenze, lo stato $S_{i,j}$ dipenderà dai tre stati
 \[
     S_{i-1,j},\qquad S_{i,j-1},\qquad S_{i-1,j-1},
 \]
-che corrisponderanno rispettivamente a una cancellazione, un'inserimento e a un match o mismatch.
+che corrisponderanno rispettivamente a una cancellazione, un inserimento e a un match o mismatch.
 
 Memorizzando esplicitamente tutti gli stati
 è necessaria una matrice di $(n+1) \times(m+1)$ elementi, e quindi uno spazio $O(nm)$.
 
 Una volta calcolato il valore ottimo, una soluzione corrispondente può essere ricostruita memorizzando le scelte effettuate
-e percorrendole a ritroso mediante \emph{traceback} 
+e percorrendole a ritroso mediante \emph{traceback}.
 
 \subsection{Longest Common Subsequence}
 
@@ -235,17 +235,33 @@ Tra tutte le sottosequenze comuni a $v$ e $w$, siamo interessati ad una di lungh
 
 Indichiamo con $s(v,w)$ la lunghezza di una LCS tra $v$ e $w$:
 \[
-    s(v,w) =  \max \{ |z|:z \text{ è una common sottosequenza di }v \text{ e }w \}
+    s(v,w) =  \max \{ |z|:z \text{ è una sottosequenza comune di }v \text{ e }w \}
 \]
 
 Considerando una variante dell'edit distance in cui sono ammesse soltanto inserzioni e delezioni, trasformare $v$ in $w$
-utilizzando una common sottosequenza di lunghezza $k$ richiede
+utilizzando una sottosequenza comune di lunghezza $k$ richiede
 \[
     (n-k) + (m-k)
 \]
 operazioni. Per una LCS, con $k=s(v,w)$, si ottiene quindi tale distanza come
 \[
     d_{\text{indel}}(v,w) = n + m - 2s(v,w)
+\]
+
+Riprendiamo l'esempio precedente utilizzando le stesse sequenze $v$ e $w$.
+La stringa
+\[
+    z=\texttt{ACT}
+\]
+è una sottosequenza di entrambe le sequenze ma è inoltre una LCS, poiché $|w|=3$ e non può quindi esistere una sottosequenza comune più lunga.
+
+Pertanto,
+\[
+    s(v,w)=3
+\]
+e
+\[
+    d_{\text{indel}}(v,w) = 4 + 3 - 2\times3 = 1.
 \]
 
 Il problema della LCS può essere ricondotto alla ricerca di un cammino di peso massimo
@@ -261,7 +277,7 @@ Ogni nodo $(i,j)$ può avere tre tipi di archi entranti:
 \begin{itemize}
     \item $(i-1,j)\rightarrow(i,j)$ (arco 'verticale', corrispondente all'omissione di un simbolo di $v$);
     \item $(i,j-1)\rightarrow(i,j)$ (arco 'orizzontale', corrispondente all'omissione di un simbolo di $w$);
-    \item $(i-1,j-1)\rightarrow(i,j)$, soltanto quando $v_i=w_j$ (arco 'diagonale', corrispondentea un match).
+    \item $(i-1,j-1)\rightarrow(i,j)$, soltanto quando $v_i=w_j$ (arco 'diagonale', corrispondente a un match).
 \end{itemize}
 
 Nel problema della LCS assegniamo un peso a ogni arco, $c(e)$, dove $e \in E$, con $E$ insieme degli archi della griglia.
@@ -344,6 +360,33 @@ Lo stato iniziale è $(0,0)$ e quello finale è $(n,m)$.
 Ogni allineamento tra $v$ e $w$ corrisponde a un cammino nell'alignment graph da $(0,0)$ a $(n,m)$ e, viceversa, ogni cammino tra questi nodi 
 rappresenta un possibile allineamento.
 
+A questo punto è importante mostrare un esempio per visualizzare l'alignment graph.
+Siano $v:=\texttt{ACCT},w:=\texttt{ACT}$ due sequenze. Sia $A$ il loro allineamento.
+Allora possiamo elencare gli archi che compongono un cammino da $(0,0)$ a $(4,3)$ nell'alignment graph associato ad $A$:
+\[
+    (0,0)\to(1,1)\to(2,2)\to(3,2)\to(4,3).
+\]
+Gli archi corrispondono a:
+\[
+    \begin{array}{c|c}
+        \text{arco} & \text{colonna dell'allineamento}\\
+        \hline
+        (0,0)\to(1,1) & (A,A)\\
+        (1,1)\to(2,2) & (C,C)\\
+        (2,2)\to(3,2) & (C,-)\\
+        (3,2)\to(4,3) & (T,T)
+    \end{array}
+\]
+producendo quindi:
+\[
+    A=
+    \begin{matrix}
+        \texttt{A} & \texttt{C} & \texttt{C} & \texttt{T} \\
+        \texttt{A} & \texttt{C} & \texttt{-} & \texttt{T}
+    \end{matrix}
+\]
+
+
 Il peso di ogni arco è definito come segue:
 \[
     \begin{aligned}
@@ -386,11 +429,11 @@ Nel modello di scoring lineare considerato di seguito,
 \[
     \text{match}= +1,\qquad \text{mismatch}= -\eta,\qquad \text{indel}= -\sigma,
 \]
-con $\eta, \sigma>0$
+con $\eta, \sigma>0$.
 
 Lo score di un allineamento può quindi essere espresso come
 \[
-    \operatorname{score}(A) = \# \text{match} - \eta\#\text{mismatch} - \sigma\#\text{gap}.
+    \operatorname{score}(A) = \# \text{match} - \eta\#\text{mismatch} - \sigma\#\text{gap},
 \]
 dove $\#\text{gap}$ indica il numero di colonne dell'allineamento contenenti un gap dovuto a una trasformazione indel.
 

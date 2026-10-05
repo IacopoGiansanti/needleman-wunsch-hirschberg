@@ -44,14 +44,14 @@ MiddleEdge mid_edge(size_t top, size_t bottom,
         mid_edge.to_i = mid_vertex_i + 1;
         mid_edge.to_j = mid_vertex_j + 1;
         mid_edge.edge = EDGE_DIAGONAL;
-    } else if(final == next_right) {
-        mid_edge.to_i = mid_vertex_i;
-        mid_edge.to_j = mid_vertex_j + 1;
-        mid_edge.edge = EDGE_HORIZONTAL;
-    } else {
+    } else if(final == next_down) {
         mid_edge.to_i = mid_vertex_i + 1;
         mid_edge.to_j = mid_vertex_j;
         mid_edge.edge = EDGE_VERTICAL;
+    } else {
+        mid_edge.to_i = mid_vertex_i;
+        mid_edge.to_j = mid_vertex_j + 1;
+        mid_edge.edge = EDGE_HORIZONTAL;
     }
 
     return mid_edge;

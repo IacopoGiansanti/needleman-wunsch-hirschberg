@@ -40,7 +40,7 @@ dell'allineamento e di separare precisamente i due sottoproblemi ricorsivi.
 \subsection{Ricorrenza, Middle vertex e Middle edge}
 
 La ricorrenza utilizzata nell'algoritmo di Hirschberg è la stessa introdotta per Needleman-Wunsch.
-Sia $S_{i,j}$ lo score ottimo dell'allineamento tra i prefissi $v_{1}\cdots v_{n}$ e $w_{1}\cdots w_{m}$.
+Sia $S_{i,j}$ lo score ottimo dell'allineamento tra i prefissi $v_{1}\cdots v_{i}$ e $w_{1}\cdots w_{j}$.
 Per $i,j>0$ vale quindi
 \[
     S_{i,j}
@@ -59,7 +59,7 @@ lo stesso problema di ottimizzazione e possono successivamente essere confrontat
 utilizzando le medesime condizioni sperimentali.
 
 La prima osservazione su cui si basa Hirschberg riguarda il calcolo degli score.
-Per determinare una cella $S_{i,j}$ sono ncessari solamente i valori
+Per determinare una cella $S_{i,j}$ sono necessari solamente i valori
 \[
     S_{i-1,j}, \qquad S_{i,j-1}, \qquad S_{i-1,j-1}.
 \]
@@ -70,7 +70,7 @@ colonna corrente.
 Senza perdita di generalità, supponiamo $n \leq m$, disponendo quindi la sequenza più corta lungo le righe dell'alignment graph.
 Gli score possono essere memorizzati in due vettori
 \[
-    \texttt{previous}, \qquad \texttt{current}.
+    \texttt{previous}, \qquad \texttt{current},
 \]
 entrambi contenenti $n+1$ elementi.
 
@@ -84,7 +84,7 @@ Consideriamo adesso la colonna centrale
 \]
 
 Ogni cammino dalla sorgente $(0,0)$ al pozzo $(n,m)$ attraversa almeno un vertice della colonna $j_{\mathrm{mid}}$.
-Vogliamo determinare quale di questi vertici appartenga ad almeno un cammino ottimo.
+Vogliamo determinare quale di questi vertici appartiene ad almeno un cammino ottimo.
 
 Per ogni $i \in \{ 0,\ldots,n \}$ definiamo
 \[
@@ -96,7 +96,7 @@ In maniera analoga, definiamo
 \[
     \operatorname{suffix}(i) = \operatorname{OPT} \left[(i,j_{\mathrm{mid}})\rightarrow(n,m) \right],
 \]
-ossia lo score del miglior cammino del medesimo vertice al singk
+ossia lo score del miglior cammino del medesimo vertice al sink.
 
 Definiamo quindi
 \[
@@ -106,21 +106,21 @@ Definiamo quindi
 La quantità $\operatorname{length}(i)$ rappresenta il massimo score ottenibile tra tutti i cammini dalla sorgente al pozzo vincolati
 a passare attraverso $(i,j_{\mathrm{mid}})$.
 
-Un \emph{middle vertex} può pertanto essere individuato scegliendo
+Poiché ogni cammino dalla sorgente al pozzo deve attraversare la colonna $j_{\mathrm{mid}}$, lo score ottimo globale può essere espresso come
 \[
-    i_{\mathrm{mid}} \in \operatorname*{arg\,max}_{0 \leq i \leq n} \operatorname{length}(i).
+    \operatorname{OPT} = \max_{0 \leq i \leq n}\left\{ \operatorname{prefix}(i) + \operatorname{suffix}(i)\right\}.
 \]
 
-Il vertice
+Allora, scegliendo
 \[
-    (i_{\mathrm{mid}},j_{\mathrm{mid}})
+    i_{\mathrm{mid}} \in \operatorname*{arg\,max}_{0 \leq i \leq n} \operatorname{length}(i),
 \]
-appartiene quindi ad almeno un cammino ottimo.
+il vertice $(i_{\mathrm{mid}},j_{\mathrm{mid}})$ appartiene ad almeno un cammino ottimo, e viene chiamato \emph{middle vertex}.
 
-Infatti, se un cammino attrersa il middle vertex, il suo prefisso fino a tale vertice e il suo suffisso fino al pozzo devono essere ottimi
-per i rispettivi sottoproblemi.
-In caso contrario sarebbe possibile sostituire una delle due parti con un cammino di score maggiore, ottenendo un cammino complessivo
-migliore e contraddicendo l'ottimalità della soluzione.
+La decomposizione è possibile grazie alla sottostruttura ottima del problema:
+se il prefisso o il suffisso di un cammino ottimo, che attraversa tale vertice, non fosse a sua volta ottimo per il corrispondente sottoproblema,
+sarebbe possibile sostituirlo con un cammino di score maggiore e ottenere uno score complessivo superiore, in contraddizione con l'ottimalità
+del cammino originario.
 
 I valori $\operatorname{prefix}(i)$ possono essere calcolati mediante la programmazione dinamica in spazio lineare descritta precedentemente,
 arrestando il calcolo alla colonna $j_{\mathrm{mid}}$.
@@ -130,23 +130,23 @@ Concettualmente, ciò equivale a considerare l'alignment graph con gli archi inv
 
 Quindi, è sufficiente eseguire la stessa ricorrenza percorrendo le sequenze in ordine inverso, come se avessimo invertito la direzione degli archi.
 
-Una volta determinato il middle vertexe rimane da inviduare quale arco uscente da esso appartenga a un cammino ottimo.
+Una volta determinato il middle vertex rimane da individuare quale arco uscente da esso appartenga a un cammino ottimo.
 
 Dal middle vertex possono partire al più tre archi, corrispondenti alle tre operazioni dell'allineamento.
 
 Sia $R(i,j)$ lo score del miglior cammino dal vertice $(i,j)$ al pozzo.
-Sia $e$ l'arco che ha come coda il middle vertex, allora definiamo i tre valori candidati
+Sia $e$ l'arco avente come coda il middle vertex, allora definiamo i tre valori candidati
 \[
     \begin{aligned}
-        & w(e_{\mathrm{vert}}) = \delta( v_{i}, -) + R(i+1,j),
-        & w(e_{\mathrm{oriz}}) = \delta(-, w_{j}) + R(i,j+1),
-        & w(e_{\mathrm{diag}}) = \delta( v_{i}, w_{j}) + R(i+1,j+1).
+        & c(e_{\downarrow}) = \delta( v_{i+1}, -) + R(i+1,j),\\
+        & c(e_{\rightarrow}) = \delta(-, w_{j+1}) + R(i,j+1),\\
+        & c(e_{\searrow}) = \delta( v_{i+1}, w_{j+1}) + R(i+1,j+1).
     \end{aligned}
 \]
 Allora, il middle edge viene scelto tra gli archi che massimizzano tali quantità.
 
 Il termine relativo al cammino dalla sorgente al middle vertex non compare nel confronto, poiché è lo stesso per tutti gli archi uscenti da tale vertice.
-E' quindi sufficiente confrontare il peso dell'arco con lo score ottimo del cammino che parte dal suo estremo finale.
+È quindi sufficiente confrontare il peso dell'arco con lo score ottimo del cammino che parte dal suo estremo finale.
 
 Una volta individuato il middle edge, il problema viene suddiviso nei due sottoproblemi posti rispettivamente prima e dopo tale arco.
 
@@ -160,49 +160,550 @@ $e_{\mathrm{mid}}$ determina una singola colonna dell'allineamento complessivo.
 In questo modo Hirschberg non necessita di una matrice globale dei predecessori; le colonne dell'allineamento vengono prodotte
 progressivamente durante la ricorsione.
 
+Analizziamo un esempio per verificare ciò che abbiamo appena detto.
+Consideriamo le solite sequenze $v:=\texttt{ACCT}$ e $w:=\texttt{ACT}$.
+La colonna centrale è:
+\[
+    j_{\mathrm{mid}}=\left\lfloor \frac{3}{2}\right\rfloor = 1
+\]
+
+I calcoli degli score in avanti e in senso inverso restituiscono:
+\[
+    \operatorname{prefix}=\begin{bmatrix}
+        -1 \\ 1 \\ 0 \\ -1 \\ -2
+    \end{bmatrix},\qquad \operatorname{suffix}=\begin{bmatrix}
+        0 \\ 1 \\ 2 \\ 0 \\ -2
+    \end{bmatrix}
+\]
+Allora,
+\[
+    \operatorname{length} = \begin{bmatrix}
+        -1 \\ 2 \\ 2 \\ -1 \\ -4
+    \end{bmatrix}
+\]
+
+Abbiamo due possibili scelte per il middle vertex, $(1,1)$ e $(2,1)$.
+Senza perdita di generalità adottiamo
+\[
+    (i_{\mathrm{mid}},j_{\mathrm{mid}}) = (1,1)
+\]
+
+Calcoliamo adesso il middle edge dal vertice $(1,1)$
+\[
+    \begin{aligned}
+        c(e_\downarrow) &=\delta(C,-)+R(2,1) =-1+2=1,\\[2mm]
+        c(e_\rightarrow) &=\delta(-,C)+R(1,2) =-1-1=-2,\\[2mm]
+        c(e_\searrow) &=\delta(C,C)+R(2,2) =1+0=1.
+    \end{aligned}
+\]
+Anche questa volta troviamo un pareggio; adottando la politica di tie-breaking della Sezione 3.4.2, l'arco scelto è
+\[
+    (1,1) \to (2,2)
+\]
+
+Infine, possiamo visualizzare il paradigma divide et impera nel nostro esempio:
+\[
+    (0,0)\rightsquigarrow(1,1)
+    \quad
+    \underbrace{(1,1)\rightarrow(2,2)}_{\text{middle edge}}
+    \quad
+    (2,2)\rightsquigarrow(4,3)
+\]
+
 \subsection{Pseudocodice}
 
-Siamo adesso pronti per realizzare lo pseudocodice per l'algoritmo di Hirschberg.
+Possiamo unire i risultati precedenti nello pseudocodice dell'algoritmo di Hirschberg.
 
-Iniziamo dal calcolo degli score in spazio lineare
-\begin{lstlisting}[style=pseudo,caption={LinearSpaceNWScore}]
-NWScore(v,w,v_source,v_sink,w_source,w_sink,delta)
-    previous <- inizializzazione della prima colonna
+Sia $(i,j)$ il vertice dell'alignment graph che rappresenta l'allineamento dei prefissi
+$v_{1}\cdots  v_{i}$ e $w_{1}\cdots  w_{j}$.
 
-    for j <- 1,...,|w| 
-    // non usiamo m poiché w potrebbe essere una sottosequenza di w originale
-        current[0] = previous[0] + delta('-',w[j])
-        for i <- 1,...,n
-            up       <- current[i-1] + delta(v[i],'-')
-            left     <- previous[i] + delta('-',w[j])
+Un sottoproblema viene identificato da un rettangolo
+\[
+    [\texttt{top},\texttt{bottom}]\times[\texttt{left},\texttt{right}]
+\]
+dell'alignment graph, avente come sorgente il vertice $(\texttt{top},\texttt{left})$ e
+come pozzo $(\texttt{bottom},\texttt{right})$.
+
+Tramite questa rappresentazione possiamo analizzare le direzioni possibili per gli archi
+all'interno del rettangolo. Un arco verticale da $(i,j)$ a $(i+1,j)$ consuma il simbolo $v_{i+1}$.
+Un arco orizzontale da $(i,j)$ a $(i,j+1)$ consuma $w_{j+1}$, mentre un arco diagonale consuma entrambi.
+
+\paragraph{Calcolo degli score in spazio lineare.}
+
+Il primo componente necessario è una versione di Needleman-Wunsch che, dato un rettangolo dell'alignment graph,
+restituisce gli score dei vertici appartenenti alla sua ultima colonna.
+
+Come osservato precedentemente, per calcolare una colonna sono sufficienti la colonna
+precedente e i valori già determinati dalla colonna corrente. Indichiamo tali vettori rispettivamente 
+con \texttt{previous} e \texttt{current}.
+
+Nello pseudocodice seguente gli indici dei vettori coincidono, per semplicità, con gli
+indici delle righe dell'alignment graph.
+
+\begin{lstlisting}[style=pseudo,caption={Calcolo degli score in spazio lineare}]
+NWScore(v,w,top,bottom,left,right,delta)
+    previous[top] <- 0
+
+    for i <- top+1,...,bottom
+        previous[i] <- previous[i-1] + delta(v[i],'-')
+
+    for j <- left+1,...,right
+        current[top] <- previous[top] + delta('-',w[j])
+
+        for i <- top+1,...,bottom
+            vertical <- current[i-1] + delta(v[i],'-')
+            horizontal <- previous[i] + delta('-',w[j])
             diagonal <- previous[i-1] + delta(v[i],w[j])
-            current[i] = max(up,left,diagonal)
-        
+            current[i] <- max(vertical,horizontal,diagonal)
+
         swap(previous,current)
 
     return previous
-            
+\end{lstlisting}
+Al termine della procedura,
+\[
+    \texttt{previous}[i] = \operatorname{OPT}\left[(\texttt{top},\texttt{left})\rightarrow(i,\texttt{right})\right],
+\]
+per ogni $i \in \{ \texttt{top},\ldots,\texttt{bottom} \}$.
+
+Possiamo notare che, quando $\texttt{right} = j_{\mathrm{mid}}$, questo vettore contiene esattamente
+i valori che in precedenza chiamavamo $\operatorname{prefix}(i)$.
+
+Per il calcolo dei valori $\operatorname{suffix}(i)$ utilizziamo una procedura simmetrica,
+\texttt{NWScoreReverse}, che visita il rettangolo a partire dal pozzo.
+
+In questo caso il vettore soddisfa
+\[
+    \texttt{previous}[i] = \operatorname{OPT}\left[(i,\texttt{left})\rightarrow(\texttt{bottom},\texttt{right})\right].
+\]
+
+\begin{lstlisting}[style=pseudo,caption={Calcolo inverso degli score}]
+NWScoreReverse(v,w,top,bottom,left,right,delta)
+    previous[bottom] <- 0
+
+    for i <- bottom-1,...,top
+        previous[i] <- previous[i+1] + delta(v[i+1],'-')
+
+    for j <- right-1,...,left
+        current[bottom] <- previous[bottom] + delta('-',w[j+1])
+
+        for i <- bottom-1,...,top
+            vertical <- current[i+1] + delta(v[i+1],'-')
+            horizontal <- previous[i] + delta('-',w[j+1])
+            diagonal <- previous[i+1] + delta(v[i+1],w[j+1])
+            current[i] <- max(vertical,horizontal,diagonal)
+
+        swap(previous,current)
+
+    return previous
 \end{lstlisting}
 
-Analogalmente, viene definita la funzione \texttt{NWScoreReverse}, che restituisce $\operatorname{suffix}(i)$.
+\paragraph{Determinazione del middle edge.}
 
-Possiamo passare allo pseudocodice per la funzione che determina il middle edge.
-\begin{lstlisting}[style=pseudo,caption={MiddleEdge}]
-MiddleEdge(top,bottom,suffix,suffix_next,middle_vertex,v,w,delta)
-    if(middle_vertex.i == bottom) then
-        middle_edge.dir = HORIZONTAL
-        return middle_edge
+Una volta individuato il middle vertex $(i,j)$, rimane da scegliere l'arco ottimo uscente da esso.
 
-    next_down = suffix[i+1] + delta(v[middle_vertex.i,'-'])
-    next_right = suffix_next[i] + delta('-',w[middle_vertex.j])
-    next_diagonal = suffix_next[i+1] + delta(v[middle_vertex.i],w[middle_vertex.j])
-    middle_edge.score = max(next_down,next_right,next_diagonal)
+Per effettuare il confronto sono necessari gli score a partire dalla colonna $j$ e dalla colonna $j+1$.
+Indichiamo con \texttt{suffix} e \texttt{suffix\_next} i due vettori corrispondenti.
 
-    return middle_edge
+\begin{lstlisting}[style=pseudo,caption={Determinazione del middle edge}]
+MiddleEdge(v,w,bottom,mid_vertex,suffix,suffix_next,delta)
+    i <- mid_vertex.i
+    j <- mid_vertex.j
+
+    if i = bottom
+        return (i,j)->(i,j+1)
+
+    vertical <- suffix[i+1] + delta(v[i+1],'-')
+    horizontal <- suffix_next[i] + delta('-',w[j+1])
+    diagonal <- suffix_next[i+1] + delta(v[i+1],w[j+1])
+    best <- max(vertical,horizontal,diagonal)
+
+    if best = diagonal
+        return (i,j)->(i+1,j+1)
+
+    else if best = vertical 
+        return (i,j)->(i+1,j)
+
+    else
+        return (i,j)->(i,j+1)
 \end{lstlisting}
+In caso di parità tra più valori candidati, è sufficiente scegliere uno qualunque degli
+archi che realizzano il massimo. Nel seguito adottiamo, per determinismo, la priorità
+diagonale, verticale, orizzontale.
 
+Per individuare il middle edge sono necessari sia
+\[
+    R(i,j_{\mathrm{mid}})
+\]
+sia
+\[
+    R(i,j_{\mathrm{mid}}+1).
+\]
+Entrambi possono essere ottenuti mediante \texttt{NWScoreReverse}, applicata rispettivamente alla colonna
+e a quella immediatamente successiva.
 
+\paragraph{Procedura ricorsiva.}
+
+Possiamo infine combinare le procedure precedenti.
+
+I casi base verificano quando uno dei due lati del rettangolo ha lunghezza nulla.
+Se $\texttt{left}=\texttt{right}$, la sottostringa $v_{\texttt{top}+1}\cdots v_{\texttt{bottom}}$
+viene allineata con la stringa vuota e l'allineamento contiene quindi soltanto archi verticali.
+Analogamente, se $\texttt{top}=\texttt{bottom}$, la sottostringa $w_{\texttt{left}+1}\cdot w_{\texttt{right}}$
+viene allineata con la stringa vuota mediante soli archi orizzontali.
+
+Negli altri casi viene individuato il middle edge e il problema viene risolto ricorsivamente
+nei due rettangoli che esso separa.
+
+\begin{lstlisting}[style=pseudo,caption={Algoritmo di Hirschberg}]
+Hirschberg(v,w,top,bottom,left,right,delta)
+    
+    if left = right
+        return allineamento verticale di v[top+1,...,bottom]
+
+    if top = bottom
+        return allineamento orizzontale di w[left+1,...,right]
+
+    middle <- floor((left + right)/2)
+
+    prefix <- NWScore(v,w,top,bottom,left,middle,delta)
+    suffix <- NWScoreReverse(v,w,top,bottom,middle,right,delta)
+
+    mid_i <- top
+
+    for i <- top+1,...,bottom
+        if prefix[i] + suffix[i] > prefix[mid_i] + suffix[mid_i]
+            mid_i <- i
+
+    mid_vertex <- (mid_i,middle)
+
+    suffix_next <- NWScoreReverse(v,w,top,bottom,middle+1,right,delta)
+
+    mid_edge <- MiddleEdge(v,w,bottom,mid_vertex,suffix,suffix_next,delta)
+
+    left_alignment <- Hirschberg(v,w,top,mid_i,left,middle,delta)
+    right_alignment <- Hirschberg(v,w,mid_edge.to_i,bottom,mid_edge.to_j,right,delta)
+
+    return concatenate(left_alignment,mid_edge,right_alignment)
+\end{lstlisting}
+Tramite un lieve abuso di notazione, nel listing la concatenazione con \texttt{mid\_edge} indica
+l'aggiunta della singola colonna di allineamento determinata da tale arco.
 
 \subsection{Analisi della complessità}
 
+Studiamo adesso la complessità temporale e spaziale dell'algoritmo di Hirschberg.
+
+Siano $n:=|v|$ e $m:=|w|$.
+Supponiamo, senza perdita di generalità, $n \leq m$, così da disporre la sequenza più corta
+lungo le righe dell'alignment graph.
+
+Analizziamo innanzitutto il costo di un singolo sottoproblema.
+Come visto nella sezione precedente, esso corrisponde a un rettangolo dell'alignment graph;
+siano $h$ e $k$ rispettivamente la sua altezza e la sua larghezza.
+
+La procedura \texttt{NWScore} visita ogni stato del rettangolo un numero costante di volte,
+richiedendo quindi tempo
+\[
+    \Theta(hk).
+\]
+Essa mantiene solamente due vettori di $h+1$ elementi, utilizzando quindi spazio
+\[
+    \Theta(h).
+\]
+
+La stessa analisi vale per \texttt{NWScoreReverse}.
+
+Per individuare il middle vertex e il middle edge viene eseguito un numero costante di scansioni del rettangolo.
+Sebbene ciò introduca un fattore costante 
+aggiuntivo rispetto a una singola esecuzione di Needleman-Wunsch, il costo temporale complessivo associato
+a un rettangolo di dimensione $h  \times k$ rimane
+\[
+    \Theta(hk).
+\]
+
+Consideriamo adesso l'intera ricorsione.
+Dopo aver individuato il middle edge, il rettangolo corrente viene suddiviso in due sottoproblemi.
+Poiché la divisione avviene rispetto alla colonna centrale, l'area complessiva dei rettangoli processati
+diminuisce geometricamente procedendo nei livelli della ricorsione.
+
+Sia $A_{0}:=nm$ l'area dell'alignment graph iniziale. Il lavoro complessivo può essere limitato, a meno di un fattore
+costante dovuto alle scansioni necessarie per ogni sottoproblema, dalla serie geometrica
+\[
+    A_{0} + \frac{A_{0}}{2} + \frac{A_{0}}{4} + \cdots = \sum^{\infty}_{\ell = 0}\frac{A_{0}}{2^{\ell}}=2 A_{0}.
+\]
+
+Ne segue che
+\[
+    T(n,m) = O(nm)
+\]
+
+D'altra parte, già nella prima chiamata è necessario calcolare gli score relativi a una porzione complessivamente proporzionale all'intero
+alignment graph, richiedendo $\Omega(nm)$ operazioni. Allora
+\[
+    \boxed{T(n,m) = \Theta(nm)}
+\]
+
+Hirschberg conserva dunque la complessità temporale asintotica rispetto a Needleman-Wunsch.
+Il vantaggio riguarda l'utilizzo della memoria: la ricostruzione divide et impera richiede di ricalcolare alcuni score,
+introducendo un maggiore fattore costante nel tempo di esecuzione, ma evita di memorizzare l'intera matrice della programmazione dinamica.
+
+Concentriamoci quindi adesso sulla complessità spaziale.
+
+In un sottoproblema di altezza $h$, i vettori utilizzati dalle procedure \texttt{NWScore} e \texttt{NWScoreReverse} contengono $h+1$ elementi.
+Poiché durante la determinazione del middle edge viene mantenuto un numero costante di tali vettori, la memoria richiesta dalle strutture di programmazione dinamica è
+\[
+    S_{\mathrm{DP}}(n,m) = \Theta\bigl(\min \{ n,m \}\bigr).
+\]
+
+I vettori utilizzati per individuare il middle edge sono necessari soltanto all'interno della chiamata corrente
+e possono essere liberati prima di procedere ricorsivamente con i due sottoproblemi.
+Conseguentemente, la memoria occupata dai vettori dei diversi livelli della ricorsione non si accumula quindi lungo lo stack.
+
+Poiché a ogni livello la larghezza del sottoproblema viene circa dimezzata,
+la profondità della ricorsione è 
+\[
+    O( \log m).
+\]
+
+Ogni record di attivazione contiene soltanto un numero costante di indici e riferimenti, per cui lo stack
+ricorsivo richiede
+\[
+    S_{\mathrm{stack}}(n,m) = O( \log m).
+\]
+
+Lo spazio ausiliario complessivo è pertanto
+\[
+    S_{\mathrm{aux}}(n,m) = O\bigl( \min \{ n,m \}+ \log  \max \{ n,m \}\bigr).
+\]
+
+In particolare, le strutture utilizzate dalla programmazione dinamica richiedono spazio lineare nella lunghezza della sequenza
+più corta. È in questo senso che Hirschberg viene definito un algoritmo di allineamento in spazio lineare.
+
+Infine consideriamo la memoria utilizzata per salvare l'output.
+Come osservato per Needleman-Wunsch, se $L$ indica il numero di colonne dell'allineamento finale, vale
+\[
+    \max \{ n,m \} \leq L \leq n+m.
+\]
+Poiché
+\[
+    \max \{ n,m \} \geq \frac{n+m}{2},
+\]
+segue che
+\[
+    L = \Theta(n+m).
+\]
+
+La rappresentazione esplicita delle due sequenze allineate richiede quindi
+\[
+    S_{\mathrm{out}}(n,m) = \Theta(n+m).
+\]
+
+Se viene considerato anche l'output, lo spazio complessivo è pertanto
+\[
+    S_{\mathrm{tot}}(n,m) = \Theta(n+m).
+\]
+
+Abbiamo allora visto come Hirschberg conservi la stessa complessità temporale asintotica di Needleman-Wunsch,
+ma elimina la necessità di memorizzare le matrici complete degli score e dei predecessori.
+Lo spazio richiesto dalle strutture utilizzate durante il calcolo passa da
+\[
+    \Theta(nm)
+\]
+a uno spazio lineare nella dimensione delle sequenze, e in particolare a
+\[
+    \Theta( \min \{ n,m \})
+\]
+per i vettori della programmazione dinamica.
+
 \subsection{Implementazione}
+
+L'implementazione di Hirschberg utilizza le stesse strutture dati e lo stesso modello di scoring introdotti
+per l'implementazione di Needleman-Wunsch.
+Quindi le sequenze vengono rappresentate dal tipo \texttt{Strand} mentre l'output viene restituito 
+attraverso una struttura \texttt{Alignment}.
+Mancano ovviamente le matrici \texttt{score} e \texttt{pred}.
+
+\subsubsection{Calcolo degli score in spazio lineare}
+
+I sottoproblemi ricorsivi non vengono rappresentati creando nuove sottostringhe.
+Ciascuno di essi è identificato tramite quattro indici,
+\[
+\texttt{v\_source},\quad \texttt{v\_sink},\quad \texttt{w\_source},\quad \texttt{w\_sink},
+\]
+che delimitano le porzioni delle due sequenze coinvolte, ricordando la rappresentazione
+degli indici del rettangolo per i sottoproblemi visti nelle sezioni precedenti.
+
+La funzione \texttt{nw\_score} implementa la procedura \texttt{NWScore} descritta nella Sezione 4.2.
+Quindi alloca due vettori di $n+1$ interi, con $n = \texttt{v\_sink} - \texttt{v\_source}$.
+
+Di seguito viene mostrato il frammento di codice che comprende l'inizializzazione dei due vettori
+e il calcolo degli score dell'ultima colonna del sottoproblema corrente.
+
+\begin{lstlisting}[language=C]
+previous[0] = 0;
+for(size_t i=1; i<=n; i++) {
+    previous[i] = previous[i-1] + scoring(v->bases[v_source + i - 1],BASE_GAP,model);
+}
+current[0] = 0;
+
+for(size_t j=1; j<=m; j++) {
+    current[0] = previous[0] + scoring(BASE_GAP,w->bases[w_source + j - 1],model);
+    for(size_t i=1; i<=n; i++) {
+        int up       = current[i-1] + scoring(v->bases[v_source + i - 1],BASE_GAP,model);
+        int left     = previous[i] + scoring(BASE_GAP,w->bases[w_source + j - 1],model);
+        int diagonal = previous[i-1] + scoring(v->bases[v_source + i - 1],w->bases[w_source + j - 1],model);
+        current[i] = max(up,left,diagonal);
+    }
+    int *temp = previous;
+    previous  = current;
+    current   = temp;
+}
+\end{lstlisting}
+
+Gli indici \texttt{i} e \texttt{j} utilizzati all'interno della funzione sono relativi al sottoproblema corrente.
+Per accedere alla sequenza originale vengono quindi sommati gli offset \texttt{v\_source} e \texttt{w\_source}.
+
+Terminato il calcolo, il vettore non più necessario viene liberato e \texttt{previous} viene restituito al chiamante.
+
+La funzione \texttt{nw\_score\_reverse} realizza invece il calcolo simmetrico necessario per gli score di suffisso.
+In questo caso l'inizializzazione parte dall'ultima posizione del vettore e le sequenze vengono percorse in ordine decrescente,
+di seguito è possibile vederne il codice.
+
+\begin{lstlisting}[language=C]
+previous[n] = 0;
+for(size_t i = n; i --> 0; ) {
+    previous[i] = previous[i+1] + scoring(v->bases[v_source + i], BASE_GAP, model);
+}
+\end{lstlisting}
+
+È interessante anche vedere come è stata affrontata l'indicizzazione dei cicli
+nel verso contrario:
+\begin{lstlisting}[language=C]
+for(size_t j = m; j --> 0; ) {
+    [...]
+    for(size_t i = n; i --> 0; ) {
+        [...]
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Middle vertex e middle edge}
+
+Per la ricerca del middle vertex vengono chiamate le funzioni \texttt{nw\_score} e \texttt{nw\_score\_reverse}, i cui risultati
+vengono salvati all'interno di due vettori, \texttt{prefix} e \texttt{suffix}.
+\begin{lstlisting}[language=C]
+size_t mid_j = w_source + m/2;
+
+int *prefix = nw_score(v,v_source,v_sink,w,w_source,mid_j,model);
+int *suffix = nw_score_reverse(v,v_source,v_sink,w,mid_j, w_sink,model);
+\end{lstlisting}
+
+Il seguente frammento mostra come viene ricercato l'elemento massimo di $\operatorname{prefix}(i)+\operatorname{suffix}(i)$
+\begin{lstlisting}[language=C]
+size_t mid_offset = 0;
+int max = prefix[0] + suffix[0];
+for(size_t i=1; i<=n; i++) {
+    int score = prefix[i] + suffix[i];
+    //length[i] = prefix[i] + suffix[i]
+    if(max < score) {
+        max = score;
+        mid_offset = i;
+    }
+}
+size_t mid_i = v_source + mid_offset;
+\end{lstlisting}
+Poiché i vettori sono indicizzati relativamente al sottoproblema, \texttt{mid\_offset} identifica la riga del middle vertex rispetto
+a \texttt{v\_source}.
+
+Successivamente viene calcolato il vettore \texttt{suffix\_next} tramite una chiamata a \texttt{nw\_score\_reverse}, alla quale
+viene passato l'indice \texttt{mid\_j + 1}.
+
+Il middle edge viene rappresentato da una struttura \texttt{MiddleEdge}, che memorizza il vertice
+iniziale, il vertice finale e la direzione dell'arco.
+
+Di seguito è presente la funzione \texttt{mid\_edge} che restituisce il middle edge di un sottoproblema.
+\begin{lstlisting}[language=C]
+MiddleEdge mid_edge(size_t top, size_t bottom, 
+                    size_t mid_vertex_i, size_t mid_vertex_j,
+                    const int *suffix, const int* suffix_next,
+                    const Strand *v, const Strand *w, const scoringModel *model) {
+
+    size_t i = mid_vertex_i - top;
+    
+    if(mid_vertex_i == bottom) {
+        MiddleEdge mid_edge = {
+            .from_i = mid_vertex_i,
+            .from_j = mid_vertex_j,
+            .to_i   = mid_vertex_i,
+            .to_j   = mid_vertex_j + 1,
+            .edge   = EDGE_HORIZONTAL
+        };
+        return mid_edge;
+    }     
+
+    int next_down     = suffix[i + 1]      + scoring(v->bases[mid_vertex_i],BASE_GAP,model);
+    int next_right    = suffix_next[i]     + scoring(BASE_GAP,w->bases[mid_vertex_j],model);
+    int next_diagonal = suffix_next[i + 1] + scoring(v->bases[mid_vertex_i],w->bases[mid_vertex_j],model);
+    int final =  max(next_down,next_right,next_diagonal);
+
+    MiddleEdge mid_edge = {
+        .from_i = mid_vertex_i,
+        .from_j = mid_vertex_j,
+    };
+
+    if(final == next_diagonal) {
+        mid_edge.to_i = mid_vertex_i + 1;
+        mid_edge.to_j = mid_vertex_j + 1;
+        mid_edge.edge = EDGE_DIAGONAL;
+    } else if(final == next_down) {
+        mid_edge.to_i = mid_vertex_i + 1;
+        mid_edge.to_j = mid_vertex_j;
+        mid_edge.edge = EDGE_VERTICAL;
+    } else {
+        mid_edge.to_i = mid_vertex_i;
+        mid_edge.to_j = mid_vertex_j + 1;
+        mid_edge.edge = EDGE_HORIZONTAL;
+    }
+
+    return mid_edge;
+}
+\end{lstlisting}
+
+Nella formulazione teorica l'arco uscente dal vertice $(i,j)$ utilizza $v_{i+1}$ e $w_{j+1}$.
+Gli array C sono indicizzati a partire da zero; dunque, se \texttt{mid\_vertex\_i} e \texttt{mid\_vertex\_j}
+rappresentano direttamente le coordinate del vertice, i simboli consumati dall'arco sono memorizzati
+in \texttt{v->bases[mid\_vertex\_i]} e \texttt{w->bases[mid\_vertex\_j]}.
+
+\subsubsection{Ricostruzione ricorsiva dell'allineamento}
+
+Avendo trovato middle vertex e middle edge siamo pronti per poter ricostruire l'allineamento.
+
+Prima di analizzare la procedura ricorsiva citiamo velocemente i casi base, che sono stati implementati in maniera
+fedele al Listing 6; se una delle due sequenze è vuota, l'unico allineamento possibile consiste nell'allineare
+tutti i simboli dell'altra sequenza con gap.
+
+Vediamo adesso la ricorrenza che concatena l'allineamento sinistro, il middle edge e l'allineamento destro.
+\begin{lstlisting}[language=C]
+free(prefix);
+free(suffix);
+free(suffix_next);
+
+hirschberg_rec(v, v_source, mid_i, w, w_source, mid_j, model, alignment, length); // sinistra
+emit(alignment, length, &edge, v, w, model);
+hirschberg_rec(v, edge.to_i, v_sink, w, edge.to_j, w_sink, model, alignment, length); // destra
+\end{lstlisting}
+
+La ricostruzione dell'allineamento segue direttamente la decomposizione
+\[
+    A=A_{\mathrm{left}}\circ e_{\mathrm{mid}}\circ A_{\mathrm{right}}
+\]
+
+Prima di iniziare la ricorsione, la funzione pubblica
+\texttt{hirschberg} dispone lungo le righe la sequenza più corta.
+Se necessario, i due input vengono temporaneamente scambiati.
+In questo modo i vettori utilizzati dalle procedure di programmazione
+dinamica hanno sempre dimensione
+\[
+    \min\{n,m\}+1,
+\]
+realizzando concretamente il limite spaziale discusso nella Sezione 4.3.

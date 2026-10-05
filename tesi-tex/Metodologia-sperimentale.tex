@@ -1,7 +1,72 @@
 \section{Metodologia sperimentale}
 
+Dopo aver analizzato teoricamente e implementato gli algoritmi di Needleman-Wunsch e Hirschberg, possiamo
+procedere al loro confronto sperimentale.
+
+L'obiettivo dell'analisi è verificare empiricamente le proprietà discusse nei capitoli precedenti,
+concentrandoci sul tempo di esecuzione e sul consumo di memoria al crescere della lunghezza
+delle sequenze.
+
+Entrambi gli algoritmi sono stati eseguiti sulle medesime coppie di sequenze, usando lo stesso modello
+di scoring, così da permettere un confronto adeguato.
+
+Nel seguito vengono descritti il dataset utilizzato, l'ambiente sul quale si è lavorato e 
+il protocollo adottato per la raccolta delle misure, in modo tale da poter valutare
+la validità dell'esperimento, che verrà presentato nel capitolo successivo.
+
 \subsection{Dataset}
+
+Per il confronto sperimentale sono state utilizzate sequenze biologiche rappresentate nel formato FASTA.
+
+% DA DOVE ARRIVANO LE SEQUENZE
+
+Per ogni esperimento vengono considerate due sequenze $v$ e $w$, di lunghezza rispettivamente $n$ e $m$.
+
+Poiché la complessità dei due algoritmi dipende dal prodotto $n\times m$, è necessario considerare input
+di dimensione crescente, in modo tale da osservare l'andamento del tempo di esecuzione e della memoria
+richiesta al crescere della dimensione del problema.
+
+Per studiare la scalabilità degli algoritmi, dalle sequenze originali vengono estratti prefissi di lunghezza crescente.
+in modo tale da controllare la dimensione dell'input mantenendo il contenuto proveniente da sequenze biologiche reali.
 
 \subsection{Ambiente hardware e software}
 
+Tutti gli esperimenti sono stati eseguiti sul medesimo sistema, in modo da mantenere costanti le principali condizioni che possono
+influenzare le prestazioni.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Componente} & \textbf{Configurazione} \\
+        \hline
+        Processore & ... \\
+        Architettura & ARM64 \\
+        Memoria RAM & ... \\
+        Sistema operativo host & ... \\
+        Ambiente di esecuzione & WSL2 / Ubuntu ... \\
+        Compilatore & ... \\
+        Versione compilatore & ... \\
+        Flag di compilazione & ... \\
+        \hline
+    \end{tabular}
+    \caption{Ambiente utilizzato per gli esperimenti.}
+\end{table}
+
 \subsection{Misura dei tempi e della memoria}
+
+La misura del tempo riguarda esclusivamente l'esecuzione dell'algoritmo di allineamento.
+Le operazioni di lettura e parsing dei file FASTA vengono quindi effettuate prima dell'inizio della misurazione, in modo da
+non includere nel confronto il costo dell'I/O.
+
+Per ogni coppia di sequenze sono state fatte più esecuzioni, in modo tale da poter rendere l'esperimento indipendente dalla variabilità.
+
+Per il consumo di memoria viene misurato il massimo utilizzo di memoria raggiunto dal processo durante l'esecuzione.
+
+Tale misura comprende non soltanto le strutture ausiliarie proprie dell'algoritmo, ma anche l'input, l'output e l'overhead associato al processo.
+Poiché tuttavia entrambi gli algoritmi vengono eseguiti nelle medesime condizioni e sulle stesse sequenze, essa consente comunque
+un confronto empirico della diversa crescita della memoria richiesta.
+
+Prima di utilizzare le misure prestazionali, viene inoltre verificata la correttezza del risultato confrontando gli score restituiti dai 
+due algoritmi. Poiché il problema può ammettere più allineamenti ottimi, non è richiesto che le due sequenze allineate coincidano esattamente;
+è invece necessario che entrambi gli algoritmi producano un allineamento valido avente lo stesso score ottimo.
