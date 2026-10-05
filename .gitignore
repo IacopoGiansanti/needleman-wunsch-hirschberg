@@ -67,3 +67,6 @@ tools/alignment_dump
 *.toc
 *.log
 *.aux
+*.bbl
+*.latexmain
+*.cls
