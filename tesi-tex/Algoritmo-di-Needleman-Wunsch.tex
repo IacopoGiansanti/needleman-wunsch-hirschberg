@@ -4,6 +4,7 @@ In questo capitolo analizzeremo l'algoritmo di Needleman-Wunsch, che è un algor
 dell'allineamento globale di sequenze.
 
 \subsection{Ricorrenza, inizializzazione e traceback}
+\label{sec:NW-1}
 
 Sia $S_{i,j}$ il miglior score globale tra $v_{1}\cdots v_{i}$ e $w_{1} \cdots w_{j}$, con $0 \leq i \leq n, 0 \leq j \leq m$.
 Quindi, come visto nel precedente capitolo, possiamo affermare che $S_{i,j}$ coincide con il peso di un cammino massimo da $(0,0)$ a $(i,j)$.
@@ -149,6 +150,7 @@ ricostruendo
 
 
 \subsection{Pseudocodice}
+\label{sec:NW-pseudocodice}
 
 Possiamo adesso fornire lo pseudocodice per l'algoritmo di Needleman-Wunsch.
 
@@ -216,6 +218,7 @@ Quindi, la prima procedura costruisce la matrice degli score e quella dei predec
 un allineamento ottimo a partire dalla cella $(n,m)$.
 
 \subsection{Analisi della complessità}
+\label{sec:NW-complessità}
 
 Abbiamo allora definito l'algoritmo standard di Needleman-Wunsch.
 Possiamo adesso analizzarne la complessità, centro del nostro confronto.
@@ -340,9 +343,10 @@ La matrice \texttt{pred} utilizza il tipo \texttt{Direction}; le possibili direz
 una maschera di bit. In questo modo una singola cella può memorizzare contemporaneamente più predecessori ottimi.
 
 \subsubsection{Algoritmo}
+\label{sec:NW-implementazione-algoritmo}
 
 Dopo l'inizializzazione della prima riga e della prima colonna delle matrici, gli stati interni vengono calcolati secondo la ricorrenza descritta nella
-Sezione 3.1. Il seguente frammento mostra il riempimento delle matrici \texttt{score} e \texttt{pred}.
+Sezione~\ref{sec:NW-1}. Il seguente frammento mostra il riempimento delle matrici \texttt{score} e \texttt{pred}.
 
 \begin{lstlisting}[language=C]
 for(size_t i=1; i<=n; i++) {
@@ -360,7 +364,7 @@ for(size_t i=1; i<=n; i++) {
 }
 \end{lstlisting}
 
-A differenza dello pseudocodice della sezione 3.2, la scelta del predecessore non viene effettuata durante il riempimento della matrice.
+A differenza dello pseudocodice della Sezione~\ref{sec:NW-pseudocodice}, la scelta del predecessore non viene effettuata durante il riempimento della matrice.
 In caso di parità, tutte le direzioni che realizzano il massimo vengono memorizzate in \texttt{pred[i][j]} mediante una bitmask.
 L'operatore OR bit a bit consente infatti di aggiungere un flag senza eliminare quelli già presenti.
 

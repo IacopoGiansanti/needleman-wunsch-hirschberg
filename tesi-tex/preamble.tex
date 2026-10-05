@@ -1,39 +1,65 @@
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
+% Modello Patrignani, versione della classe 2023/11/06.
+% FAQ: https://patrignani.inf.uniroma3.it/tesi-faq.html
+% La classe originale imposta memoir, A4, 11 pt, oneside, italiano,
+% \linespread{1.4}, margini sinistro 3.5 cm e destro 3 cm.
+% Non sovrapporre geometry, tocloft o un'altra classe report/article:
+% memoir gestisce direttamente impaginazione e indice.
+
+% LINGUA E FONT
+% babel, fontenc, graphicx, setspace e fancyhdr sono gia' nella classe.
 \usepackage[utf8]{inputenc}
-\usepackage[italian]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% MATEMATICA: conserva i pacchetti e i comandi dei tuoi capitoli.
 \usepackage{amsmath,amssymb,mathtools}
-\usepackage{geometry}
+\usepackage{aligned-overset}
+\newcommand{\score}{\operatorname{Score}}
+\newcommand{\LCS}{\operatorname{LCS}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\OPT}{\operatorname{OPT}}
+% Compatibilita' con gli attuali \tt{A}, ..., \tt{T} nei tuoi contenuti.
+% memoir disabilita il vecchio \tt; qui si limita il font al suo argomento.
+\renewcommand{\tt}[1]{\ifmmode\mathtt{#1}\else\texttt{#1}\fi}
+
+% IMPAGINAZIONE
+% Conserva il blocco verticale del modello; rende effettive e coerenti
+% le misure di memoir, inclusi i margini laterali impostati dalla classe.
+\setlength{\headheight}{32pt}
+\checkandfixthelayout
+\raggedbottom
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt}
+% Evita sbordature nei paragrafi con formule e nomi di funzione indivisibili.
+\setlength{\emergencystretch}{3em}
+
+% TABELLE ED ELENCHI: memoir include gia' booktabs e le funzioni di caption.
+\usepackage{array,longtable}
 \usepackage{enumitem}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{longtable}
-\usepackage{hyperref}
+\usepackage{etoolbox}
+
+% CODICE
 \usepackage{xcolor}
 \usepackage{listings}
-\usepackage{microtype}
-\usepackage{aligned-overset}
-    
-\geometry{margin=2.5cm}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{0.6em}
 \lstset{
-    language=C,
-    basicstyle=\ttfamily\small,
-    breaklines=true,
-    breakatwhitespace=false,
-    columns=fullflexible,
-    frame=single,
-    keepspaces=true,
-    literate =
-        {à}{{\`a}}1
-        {è}{{\`e}}1
-        {é}{{\'e}}1
-        {ì}{{\`i}}1
-        {ò}{{\`o}}1
-        {ù}{{\`u}}1
+  language=C,
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  frame=single,
+  keepspaces=true,
+  showstringspaces=false,
+  literate=
+    {à}{{\`a}}1
+    {è}{{\`e}}1
+    {é}{{\'e}}1
+    {ì}{{\`i}}1
+    {ò}{{\`o}}1
+    {ù}{{\`u}}1
 }
 \lstdefinestyle{pseudo}{
+  language={},
   basicstyle=\ttfamily\small,
   columns=fullflexible,
   keepspaces=true,
@@ -41,7 +67,88 @@
   breaklines=true,
   showstringspaces=false
 }
-\newcommand{\score}{\operatorname{Score}}
-\newcommand{\LCS}{\operatorname{LCS}}
-\newcommand{\argmax}{\operatorname*{arg\,max}}
-\newcommand{\OPT}{\operatorname{OPT}}
+\AtBeginEnvironment{lstlisting}{\SingleSpacing}
+
+% INTESTAZIONI: come nel modello, capitolo a sinistra e pagina a destra.
+% Il contenitore evita il problema noto della classe con titoli lunghi.
+\fancyhf{}
+\setlength{\headwidth}{\textwidth}
+\fancyhead[L]{\parbox[b]{0.88\textwidth}{\small\bfseries\nouppercase{\leftmark}}}
+\fancyhead[R]{\textbf{\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\makeatletter
+\renewcommand{\chaptermark}[1]{%
+  \markboth{\if@mainmatter\chaptername\ \thechapter.\ \fi #1}{}}
+\makeatother
+\renewcommand{\sectionmark}[1]{}
+
+% LINK: indice e riferimenti restano cliccabili, senza riquadri colorati.
+\usepackage[hidelinks,plainpages=false]{hyperref}
+
+% FRONTESPIZIO
+% Conserva composizione, logo e dati del modello. Il titolo usa una misura
+% esplicita per rientrare in una pagina; matricola e correlatore sono opzionali.
+% Questi adattamenti evitano di modificare la classe originale distribuita.
+\makeatletter
+\renewcommand{\generaFrontespizio}{%
+  \thispagestyle{empty}
+  \begin{center}
+    \begin{SingleSpace}
+      \vspace*{5mm}
+      \includegraphics[width=0.4\linewidth]{figure/uniroma3-logo.pdf}\par
+      \vspace{8mm}
+      {\large UNIVERSIT\`A DEGLI STUDI ROMA TRE\par}
+      \vspace{5mm}
+      {\Large Dipartimento di Ingegneria Civile, Informatica\par
+      e delle Tecnologie Aeronautiche\par}
+      \vspace{4mm}
+      {\large Corso di Laurea in Ingegneria Informatica\par}
+      \vspace{12mm}
+      {\Large Tesi di Laurea\par}
+      \vspace{10mm}
+      {\fontsize{20}{25}\selectfont\bfseries \@titolo\par}
+      \vspace{12mm}
+      {\large Laureando\par\textbf{\@autore}\par}
+      \ifdefempty{\@matricola}{}{Matricola \@matricola\par}
+      \vspace{7mm}
+      {\large Relatore\par\textbf{\@relatore}\par}
+      \ifdefempty{\@correlatore}{}{%
+        \vspace{5mm}{\large Correlatore\par\@correlatore\par}}
+    \end{SingleSpace}
+    \vfill
+    {\large Anno Accademico \@annoAccademico\par}
+  \end{center}
+  \clearpage
+}
+\makeatother
+
+% COMPATIBILITA' CON I CONTENUTI ESISTENTI
+% Nei tuoi file: section -> chapter, subsection -> section,
+% subsubsection -> subsection. La conversione vale solo durante l'input.
+% Se in futuro convertirai i file a \chapter, userai il normale \input.
+\let\TesiSection\section
+\let\TesiSubsection\subsection
+\newcommand{\InputCapitolo}[2][]{%
+  \begingroup
+    \let\section\chapter
+    \let\subsection\TesiSection
+    \let\subsubsection\TesiSubsection
+    \ifstrempty{#1}{}{%
+      \renewcommand{\chaptermark}[1]{%
+        \markboth{\chaptername\ \thechapter.\ #1}{}}}
+    \input{#2}
+    \clearpage
+  \endgroup
+}
+\newcommand{\InputIntroduzione}[1]{%
+  \begingroup
+    % Con \frontmatter, memoir genera un capitolo senza numero,
+    % ma inserito nell'indice: stesso comportamento di \introduzione.
+    \let\section\chapter
+    \let\subsection\TesiSection
+    \let\subsubsection\TesiSubsection
+    \input{#1}
+    \clearpage
+  \endgroup
+}

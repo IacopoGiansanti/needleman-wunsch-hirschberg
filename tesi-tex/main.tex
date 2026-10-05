@@ -1,19 +1,58 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+% Modello fornito nelle FAQ di Patrignani: classe originale inclusa nel pacchetto.
+\documentclass{TesiDiaUniroma3}
 \input{preamble}
-\title{Ottimizzazione della Memoria nella Programmazione Dinamica per l’Allineamento di Sequenze}
-\author{Iacopo Giansanti}
-\date{September 2026}
+
+% DATI DEL FRONTESPIZIO
+\titolo{Ottimizzazione della memoria nella programmazione dinamica per l'allineamento di sequenze}
+\autore{Iacopo Giansanti}
+\relatore{[Maurizio Patrignani]}
+\annoAccademico{2023/2024}     
+\matricola{606248}            
+\correlatore{Vincenzo Bonifaci}
+
+\hypersetup{
+  pdftitle={Ottimizzazione della memoria nella programmazione dinamica per l'allineamento di sequenze},
+  pdfauthor={Iacopo Giansanti}
+}
 
 \begin{document}
 
-\maketitle
-\tableofcontents
-\newpage
-\input{Introduzione}
-\input{Allineamento-di-sequenze-e-programmazione-dinamica}
-\input{Algoritmo-di-Needleman-Wunsch}
-\input{Algoritmo-di-Hirschberg}
-\input{Metodologia-sperimentale}
-\input{Risultati-e-confronto}
+% PRELIMINARI: numerazione romana; frontespizio senza numero visibile.
+\frontmatter
+\hypersetup{pageanchor=false}
+\generaFrontespizio
+\hypersetup{pageanchor=true}
+
+% Eventuali dedica e ringraziamenti, come nel modello, restano facoltativi:
+% \dedica{Testo della dedica}
+% \generaDedica
+% \ringraziamenti{Ringraziamenti}
+
+% Introduzione prima dell'indice, non numerata come capitolo.
+% Il comando riconosce il tuo attuale \section{Introduzione}.
+\InputIntroduzione{Introduzione}
+\generaIndice
+
+% Attivare gli elenchi quando saranno utili nel documento:
+% \generaIndiceFigure
+% \generaIndiceTabelle
+
+% CORPO: numerazione araba da 1, capitoli numerati.
+\mainmatter
+% Adattamento dei file gia' scritti per article: non occorre modificarli.
+% L'argomento opzionale serve SOLO a rendere breve l'intestazione di pagina.
+\InputCapitolo[Allineamento di sequenze e programmazione dinamica]{Allineamento-di-sequenze-e-programmazione-dinamica}
+\InputCapitolo{Algoritmo-di-Needleman-Wunsch}
+\InputCapitolo{Algoritmo-di-Hirschberg}
+\InputCapitolo{Metodologia-sperimentale}
+\InputCapitolo{Risultati-e-confronto}
+
+% PARTE FINALE, come nel modello.
+\backmatter
+% Quando Conclusioni.tex esistera' e conterra' \section{Conclusioni}:
+% \InputCapitolo{Conclusioni}
+% Quando avrai preparato bibliografia.bib e inserito le citazioni nei capitoli:
+% \bibliography{bibliografia}
+% Lo stile alpha e' gia' impostato dalla classe. Non caricare anche biblatex.
+
 \end{document}

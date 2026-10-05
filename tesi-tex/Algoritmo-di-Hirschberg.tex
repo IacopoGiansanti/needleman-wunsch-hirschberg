@@ -196,7 +196,7 @@ Calcoliamo adesso il middle edge dal vertice $(1,1)$
         c(e_\searrow) &=\delta(C,C)+R(2,2) =1+0=1.
     \end{aligned}
 \]
-Anche questa volta troviamo un pareggio; adottando la politica di tie-breaking della Sezione 3.4.2, l'arco scelto è
+Anche questa volta troviamo un pareggio; adottando la politica di tie-breaking della Sezione~\ref{sec:NW-implementazione-algoritmo}, l'arco scelto è
 \[
     (1,1) \to (2,2)
 \]
@@ -211,6 +211,7 @@ Infine, possiamo visualizzare il paradigma divide et impera nel nostro esempio:
 \]
 
 \subsection{Pseudocodice}
+\label{sec:H-pseudocodice}
 
 Possiamo unire i risultati precedenti nello pseudocodice dell'algoritmo di Hirschberg.
 
@@ -269,8 +270,11 @@ per ogni $i \in \{ \texttt{top},\ldots,\texttt{bottom} \}$.
 Possiamo notare che, quando $\texttt{right} = j_{\mathrm{mid}}$, questo vettore contiene esattamente
 i valori che in precedenza chiamavamo $\operatorname{prefix}(i)$.
 
-Per il calcolo dei valori $\operatorname{suffix}(i)$ utilizziamo una procedura simmetrica,
-\texttt{NWScoreReverse}, che visita il rettangolo a partire dal pozzo.
+Per il calcolo dei valori $\operatorname{suffix}(i)$ utilizziamo una procedura simmetrica
+\[
+    \texttt{NWScoreReverse},
+\]
+che visita il rettangolo a partire dal pozzo.
 
 In questo caso il vettore soddisfa
 \[
@@ -533,7 +537,7 @@ Ciascuno di essi è identificato tramite quattro indici,
 che delimitano le porzioni delle due sequenze coinvolte, ricordando la rappresentazione
 degli indici del rettangolo per i sottoproblemi visti nelle sezioni precedenti.
 
-La funzione \texttt{nw\_score} implementa la procedura \texttt{NWScore} descritta nella Sezione 4.2.
+La funzione \texttt{nw\_score} implementa la procedura \texttt{NWScore} descritta nella Sezione~\ref{sec:H-pseudocodice}.
 Quindi alloca due vettori di $n+1$ interi, con $n = \texttt{v\_sink} - \texttt{v\_source}$.
 
 Di seguito viene mostrato il frammento di codice che comprende l'inizializzazione dei due vettori
@@ -589,8 +593,8 @@ for(size_t j = m; j --> 0; ) {
 
 \subsubsection{Middle vertex e middle edge}
 
-Per la ricerca del middle vertex vengono chiamate le funzioni \texttt{nw\_score} e \texttt{nw\_score\_reverse}, i cui risultati
-vengono salvati all'interno di due vettori, \texttt{prefix} e \texttt{suffix}.
+Per la ricerca del middle vertex vengono chiamate le funzioni per il calcolo degli score in tempo lineare, 
+i cui risultati vengono salvati all'interno di due vettori, \texttt{prefix} e \texttt{suffix}.
 \begin{lstlisting}[language=C]
 size_t mid_j = w_source + m/2;
 
@@ -706,4 +710,6 @@ dinamica hanno sempre dimensione
 \[
     \min\{n,m\}+1,
 \]
-realizzando concretamente il limite spaziale discusso nella Sezione 4.3.
+realizzando concretamente il limite spaziale discusso nella Sezione~\ref{sec:NW-complessità}.
+
+% !TeX root = main.tex
