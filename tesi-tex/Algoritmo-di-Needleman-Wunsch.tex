@@ -1,6 +1,6 @@
-\section{Algoritmo di Needleman-Wunsch}
+\section{Algoritmo di Needleman--Wunsch}
 
-In questo capitolo analizzeremo l'algoritmo di Needleman-Wunsch, che è un algoritmo di programmazione dinamica per il problema
+In questo capitolo analizzeremo l'algoritmo di Needleman--Wunsch \cite{needleman--wunsch}, che è un algoritmo di programmazione dinamica per il problema
 dell'allineamento globale di sequenze.
 
 \subsection{Ricorrenza, inizializzazione e traceback}
@@ -79,13 +79,15 @@ Possiamo, quindi, formalizzare la \emph{ricorrenza}:
 \]
 con $1 \leq i \leq n$ e $1 \leq j \leq m$.
 
-Questa relazione costituisce la ricorrenza fondamentale dell'algoritmo di Needleman-Wunsch.
+Questa relazione costituisce la ricorrenza fondamentale dell'algoritmo di Needleman--Wunsch
+\cite[pp.~255--256]{compeau--pevzner}.
 
 Il calcolo di $S_{n,m}$ soddisfa il primo degli obiettivi formulati nel capitolo precedente, fornendo
 \[
     S_{n,m} = \operatorname{OPT}(v,w).
 \]
-Per ricostruire anche un allineamento che realizzi tale score è necessario mantenere l'informazione relativa alle scelte effettuate durante il calcolo.
+Per ricostruire anche un allineamento che realizzi tale score è necessario mantenere l'informazione relativa alle scelte effettuate durante il calcolo
+\cite[pp.~251--252]{compeau--pevzner}.
 Quindi, durante il calcolo di $S_{i,j}$, possiamo memorizzare quale predecessore ha prodotto il massimo all'interno di una matrice $B$:
 \[
     B_{i,j} \in \{ \uparrow, \leftarrow, \nwarrow \}.
@@ -152,7 +154,7 @@ ricostruendo
 \subsection{Pseudocodice}
 \label{sec:NW-pseudocodice}
 
-Possiamo adesso fornire lo pseudocodice per l'algoritmo di Needleman-Wunsch.
+Possiamo adesso fornire lo pseudocodice per l'algoritmo di Needleman--Wunsch.
 
 \begin{lstlisting}[style=pseudo,caption={Global Alignment}]
 NeedlemanWunsch(v,w,delta)
@@ -220,7 +222,7 @@ un allineamento ottimo a partire dalla cella $(n,m)$.
 \subsection{Analisi della complessità}
 \label{sec:NW-complessità}
 
-Abbiamo allora definito l'algoritmo standard di Needleman-Wunsch.
+Abbiamo allora definito l'algoritmo standard di Needleman--Wunsch.
 Possiamo adesso analizzarne la complessità, centro del nostro confronto.
 
 Sia $T(n,m)$ la complessità di esecuzione, temporale, dell'algoritmo.
@@ -272,7 +274,8 @@ abbiamo bisogno di
 \]
 Allora, possiamo notare come il calcolo della colonna $j$ richieda soltanto la colonna $j-1$ e i valori già calcolati della colonna $j$.
 Quindi, se riduciamo il problema soltanto al calcolo del punteggio ottimo, potremmo diminuire lo spazio necessario, andando ad usare soltanto
-due vettori di $n+1$ o $m+1$ elementi, scegliendo opportunamente la sequenza più corta, ottenendo quindi uno spazio lineare.
+due vettori di $n+1$ o $m+1$ elementi, scegliendo opportunamente la sequenza più corta, ottenendo quindi uno spazio lineare
+\cite[pp.~230--231]{jones--pevzner}.
 \[
     S_{\text{score}}(n,m) = \Theta\bigl(\min \{ n,m \}\bigr).
 \]
@@ -286,7 +289,7 @@ e non soltanto il suo valore, mantenendo una complessità spaziale lineare.
 
 \subsection{Implementazione}
 
-L'algoritmo di Needleman-Wunsch è stato implementato in C mantenendo una corrispondenza diretta tra gli oggetti introdotti nella
+L'algoritmo di Needleman--Wunsch è stato implementato in C mantenendo una corrispondenza diretta tra gli oggetti introdotti nella
 formulazione teorica e le strutture dati utilizzate nel programma.
 In questa sezione vengono descritte le principali scelte implementative rilevanti ai fini del confronto sperimentale.
 
@@ -301,7 +304,7 @@ includendo quindi le quattro basi azotate e un valore dedicato al gap.
 
 Un filamento di DNA è rappresentato dal tipo \texttt{Strand}, contenente un array di tipo \texttt{Base} e la lunghezza di tale array.
 
-La funzione associata all'algoritmo di Needleman-Wunsch restituisce un oggetto di tipo
+La funzione associata all'algoritmo di Needleman--Wunsch restituisce un oggetto di tipo
 \[
     \texttt{Alignment},
 \]

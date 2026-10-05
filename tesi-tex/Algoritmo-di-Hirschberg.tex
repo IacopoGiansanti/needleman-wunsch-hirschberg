@@ -13,8 +13,11 @@ Questa ottimizzazione, tuttavia, non permette direttamente di ricostruire un
 allineamento ottimo, poiché le informazioni necessarie al traceback vengono
 progressivamente eliminate.
 
-L'obiettivo dell'algoritmo di Hirschberg è mantenere una complessità spaziale
-lineare, ricostruendo comunque un allineamento associato allo score massimo.
+L'algoritmo proposto da Hirschberg \cite{hirschberg} nasce nel conteso del problema della Longest Common Subsequence e utilizza
+una strategia divide et impera per consentire la ricostruzione della soluzione in sazio lineare.
+Nel seguito consideriamo la corrispondente formulazione per il problema dell'allineamento globale di sequenze \cite[Sec.~7.2]{jones--pevzner}.
+
+L'obiettivo è mantenere una complessità spaziale lineare, ricostruendo comunque un allineamento associato allo score massimo.
 
 Per ottenere questo risultato, Hirschberg combina il calcolo degli score in spazio
 lineare con una strategia \emph{divide et impera} applicata all'alignment graph.
@@ -27,7 +30,7 @@ attraversare la colonna centrale del grafo,
 Se riusciamo quindi a individuare un vertice della colonna $j_{\mathrm{mid}}$
 appartenente ad almeno un cammino ottimo, possiamo suddividere il problema in due
 sottoproblemi: la ricerca di un cammino ottimo dalla sorgente a tale vertice e la
-ricerca di un cammino ottimo dal vertice al sink.
+ricerca di un cammino ottimo dal vertice al sink \cite[pp.~232--234]{jones--pevzner}.
 
 Applicando ricorsivamente questa procedura è possibile ricostruire il cammino
 ottimo senza memorizzare l'intera matrice dei predecessori.
@@ -39,7 +42,7 @@ dell'allineamento e di separare precisamente i due sottoproblemi ricorsivi.
 
 \subsection{Ricorrenza, Middle vertex e Middle edge}
 
-La ricorrenza utilizzata nell'algoritmo di Hirschberg è la stessa introdotta per Needleman-Wunsch.
+La ricorrenza utilizzata nell'algoritmo di Hirschberg è la stessa introdotta per Needleman--Wunsch.
 Sia $S_{i,j}$ lo score ottimo dell'allineamento tra i prefissi $v_{1}\cdots v_{i}$ e $w_{1}\cdots w_{j}$.
 Per $i,j>0$ vale quindi
 \[
@@ -130,7 +133,7 @@ Concettualmente, ciò equivale a considerare l'alignment graph con gli archi inv
 
 Quindi, è sufficiente eseguire la stessa ricorrenza percorrendo le sequenze in ordine inverso, come se avessimo invertito la direzione degli archi.
 
-Una volta determinato il middle vertex rimane da individuare quale arco uscente da esso appartenga a un cammino ottimo.
+Una volta determinato il middle vertex rimane da individuare quale arco uscente da esso appartenga a un cammino ottimo \cite[pp.~275--276]{compeau--pevzner}.
 
 Dal middle vertex possono partire al più tre archi, corrispondenti alle tre operazioni dell'allineamento.
 
@@ -213,7 +216,7 @@ Infine, possiamo visualizzare il paradigma divide et impera nel nostro esempio:
 \subsection{Pseudocodice}
 \label{sec:H-pseudocodice}
 
-Possiamo unire i risultati precedenti nello pseudocodice dell'algoritmo di Hirschberg.
+Possiamo unire i risultati precedenti nello pseudocodice dell'algoritmo di Hirschberg \cite[pp.~269--276]{compeau--pevzner}.
 
 Sia $(i,j)$ il vertice dell'alignment graph che rappresenta l'allineamento dei prefissi
 $v_{1}\cdots  v_{i}$ e $w_{1}\cdots  w_{j}$.
@@ -231,7 +234,7 @@ Un arco orizzontale da $(i,j)$ a $(i,j+1)$ consuma $w_{j+1}$, mentre un arco dia
 
 \paragraph{Calcolo degli score in spazio lineare.}
 
-Il primo componente necessario è una versione di Needleman-Wunsch che, dato un rettangolo dell'alignment graph,
+Il primo componente necessario è una versione di Needleman--Wunsch che, dato un rettangolo dell'alignment graph,
 restituisce gli score dei vertici appartenenti alla sua ultima colonna.
 
 Come osservato precedentemente, per calcolare una colonna sono sufficienti la colonna
@@ -419,7 +422,7 @@ La stessa analisi vale per \texttt{NWScoreReverse}.
 
 Per individuare il middle vertex e il middle edge viene eseguito un numero costante di scansioni del rettangolo.
 Sebbene ciò introduca un fattore costante 
-aggiuntivo rispetto a una singola esecuzione di Needleman-Wunsch, il costo temporale complessivo associato
+aggiuntivo rispetto a una singola esecuzione di Needleman--Wunsch, il costo temporale complessivo associato
 a un rettangolo di dimensione $h  \times k$ rimane
 \[
     \Theta(hk).
@@ -447,7 +450,7 @@ alignment graph, richiedendo $\Omega(nm)$ operazioni. Allora
     \boxed{T(n,m) = \Theta(nm)}
 \]
 
-Hirschberg conserva dunque la complessità temporale asintotica rispetto a Needleman-Wunsch.
+Hirschberg conserva dunque la complessità temporale asintotica rispetto a Needleman--Wunsch.
 Il vantaggio riguarda l'utilizzo della memoria: la ricostruzione divide et impera richiede di ricalcolare alcuni score,
 introducendo un maggiore fattore costante nel tempo di esecuzione, ma evita di memorizzare l'intera matrice della programmazione dinamica.
 
@@ -484,7 +487,7 @@ In particolare, le strutture utilizzate dalla programmazione dinamica richiedono
 più corta. È in questo senso che Hirschberg viene definito un algoritmo di allineamento in spazio lineare.
 
 Infine consideriamo la memoria utilizzata per salvare l'output.
-Come osservato per Needleman-Wunsch, se $L$ indica il numero di colonne dell'allineamento finale, vale
+Come osservato per Needleman--Wunsch, se $L$ indica il numero di colonne dell'allineamento finale, vale
 \[
     \max \{ n,m \} \leq L \leq n+m.
 \]
@@ -507,7 +510,7 @@ Se viene considerato anche l'output, lo spazio complessivo è pertanto
     S_{\mathrm{tot}}(n,m) = \Theta(n+m).
 \]
 
-Abbiamo allora visto come Hirschberg conservi la stessa complessità temporale asintotica di Needleman-Wunsch,
+Abbiamo allora visto come Hirschberg conservi la stessa complessità temporale asintotica di Needleman--Wunsch,
 ma elimina la necessità di memorizzare le matrici complete degli score e dei predecessori.
 Lo spazio richiesto dalle strutture utilizzate durante il calcolo passa da
 \[
@@ -522,7 +525,7 @@ per i vettori della programmazione dinamica.
 \subsection{Implementazione}
 
 L'implementazione di Hirschberg utilizza le stesse strutture dati e lo stesso modello di scoring introdotti
-per l'implementazione di Needleman-Wunsch.
+per l'implementazione di Needleman--Wunsch.
 Quindi le sequenze vengono rappresentate dal tipo \texttt{Strand} mentre l'output viene restituito 
 attraverso una struttura \texttt{Alignment}.
 Mancano ovviamente le matrici \texttt{score} e \texttt{pred}.

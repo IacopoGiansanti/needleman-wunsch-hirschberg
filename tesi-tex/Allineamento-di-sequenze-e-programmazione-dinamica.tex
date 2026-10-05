@@ -4,10 +4,10 @@
 
 Il DNA è costituito da quattro tipi di nucleotidi, caratterizzati dalle seguenti basi azotate:
 \begin{itemize}
-    \item Adenina, \tt{A};
-    \item Citosina, \tt{C};
-    \item Guanina, \tt{G};
-    \item Timina, \tt{T}.
+    \item Adenina, \texttt{A};
+    \item Citosina, \texttt{C};
+    \item Guanina, \texttt{G};
+    \item Timina, \texttt{T}.
 \end{itemize}
 I due filamenti della molecola sono complementari e antiparalleli, con appaiamenti
 \[
@@ -51,7 +51,7 @@ Due sequenze genomiche omologhe possono differire tra loro a causa di mutazioni.
 \end{array}
 \]
 
-Gli ultimi due eventi verranno talvolta trattati come appartenenti a un unico tipo, dal nome \emph{indel}.
+Gli ultimi due eventi verranno talvolta trattati come appartenenti a un unico tipo, dal nome \emph{indel} \cite[pp.~167--172]{jones--pevzner}.
 
 Supponiamo, quindi, di avere due sequenze genomiche omologhe che differiscono a causa di mutazioni genetiche; come possiamo quantificare e
 individuare la somiglianza tra le due sequenze?
@@ -65,13 +65,13 @@ Siano $x,y$ due stringhe della stessa lunghezza, allora la distanza di Hamming �
 \[
     d_H(x,y) := |\{i:x_i\neq y_i\}|,
 \]
-ovvero il numero di posizioni in cui due stringhe differiscono.
+ovvero il numero di posizioni in cui due stringhe differiscono \cite{jones--pevzner}.
 La distanza di Hamming è però applicabile soltanto a stringhe della stessa lunghezza e non modella adeguatamente inserzioni e delezioni, che possono
 inoltre alterare la corrispondenza tra le posizioni delle due sequenze.
 
 Abbiamo quindi bisogno di una misura più generale.
 Definiamo allora l'\emph{edit distance}, o anche distanza di Levenshtein, $d(v,w)$, come il numero minimo di operazioni elementari
-di inserimento, cancellazione e sostituzione necessarie per trasformare una sequenza $v$ in una sequenza $w$.
+di inserimento, cancellazione e sostituzione necessarie per trasformare una sequenza $v$ in una sequenza $w$ \cite[pp.~167--172]{jones--pevzner}.
 
 L'edit distance fornisce una misura della dissimilarità tra due sequenze. Per rappresentare esplicitamente le corrispondenze tra i loro simboli
 introduciamo ora il concetto di \textbf{allineamento}.
@@ -85,7 +85,7 @@ con
     \max \{ |v|,|w| \}\leq L \leq |v| + |w|,
 \]
 tale che, eliminando i simboli di gap (' \texttt{-} ') dalla prima riga, si ottiene $v$, mentre eliminandoli dalla seconda si ottiene $w$.
-Non sono ammesse colonne contenenti due gap.
+Non sono ammesse colonne contenenti due gap \cite[pp.~226--228]{compeau--pevzner}.
 
 Ogni colonna di un allineamento corrisponde a uno dei seguenti casi:
 \begin{itemize}
@@ -121,7 +121,8 @@ Una funzione di scoring (anche detta modello) per una sequenza di DNA è general
     \end{cases}
 \]
 con $\mu,\eta,\sigma > 0$.
-Il modello in cui mismatch e gap hanno la stessa penalità si ottiene come caso particolare ponendo $\eta = \sigma$.
+Il modello in cui mismatch e gap hanno la stessa penalità si ottiene come caso particolare ponendo $\eta = \sigma$
+\cite[pp.~177--180]{jones--pevzner}.
 
 Grazie alla funzione di scoring possiamo anche definire la \textbf{scoring matrix}, 
 \[
@@ -155,7 +156,8 @@ Il \emph{problema dell'allineamento globale} (Global Alignment Problem) consiste
 
 Nel modello precedente ogni gap viene penalizzato indipendentemente.
 Una successione di gap consecutivi può tuttavia essere interpretata come risultato di un unico evento di inserimento o cancellazione.
-Per questo motivo vengono spesso utilizzate penalità affini, che distinguono il costo di apertura di un gap da quello della sua estensione.
+Per questo motivo vengono spesso utilizzate penalità affini, che distinguono il costo di apertura di un gap da quello della sua estensione
+\cite[p.~184]{jones--pevzner}.
 Tale generalizzazione richiede stati aggiuntivi nella programmazione dinamica; nel seguito ci concentreremo tuttavia sul modello a penalità
 lineare utilizzato dagli algoritmi oggetto del confronto.
 
@@ -163,7 +165,8 @@ lineare utilizzato dagli algoritmi oggetto del confronto.
 
 La \emph{programmazione dinamica} è una tecnica algoritmica adatta a problemi caratterizzati da sottoproblemi sovrapposti
 e da una proprietà di sottostruttura ottima.
-Le soluzioni dei sottoproblemi vengono memorizzate, evitando di calcolarli più volte.
+Le soluzioni dei sottoproblemi vengono memorizzate, evitando di calcolarli più volte
+\cite[Sec.~14.3]{cormen}.
 
 Nel problema di allineamento che considereremo, i sottoproblemi possono essere indicizzati mediante due indici $i$ e $j$.
 In particolare, una ricorrenza avrà tipicamente la forma
@@ -231,7 +234,8 @@ Allora, la stringa
 \]
 è una sottosequenza comune.
 
-Tra tutte le sottosequenze comuni a $v$ e $w$, siamo interessati ad una di lunghezza massima, detta \textbf{Longest Common Subsequence} (LCS).
+Tra tutte le sottosequenze comuni a $v$ e $w$, siamo interessati ad una di lunghezza massima, detta \textbf{Longest Common Subsequence} (LCS)
+\cite[pp.~172--177]{jones--pevzner}.
 
 Indichiamo con $s(v,w)$ la lunghezza di una LCS tra $v$ e $w$:
 \[
@@ -265,7 +269,8 @@ e
 \]
 
 Il problema della LCS può essere ricondotto alla ricerca di un cammino di peso massimo
-da $(0,0)$ a $(n,m)$ su un digrafo aciclico definito in modo appropriato come segue.
+da $(0,0)$ a $(n,m)$ su un digrafo aciclico definito in modo appropriato come segue
+\cite[pp.~172--177]{jones--pevzner}.
 
 A ogni coppia di prefissi
 \[
@@ -319,11 +324,12 @@ Poiché ogni stato viene calcolato utilizzando un numero costante di operazioni,
 \]
 
 Se interessa soltanto la lunghezza della LCS, è sufficiente mantenere in memoria le righe necessarie al calcolo,
-riducendo così lo spazio a $O(\min(n,m))$.
+riducendo così lo spazio a $O(\min(n,m))$ \cite[p.~230]{jones--pevzner}.
 
 \subsection{Alignment graph}
 
-La rappresentazione tramite grafo introdotta per la LCS può essere generalizzata al problema dell'allineamento di sequenze.
+La rappresentazione tramite grafo introdotta per la LCS può essere generalizzata al problema dell'allineamento di sequenze
+\cite[pp.~167--177]{jones--pevzner}.
 
 Siano $v$ e $w$ due sequenze, con $|v| = n$ e $|w| = m$.
 Definiamo l'\textbf{alignment graph} come il grafo diretto aciclico i cui nodi sono le coppie
@@ -420,7 +426,8 @@ costituito da $r$ colonne, definiamo il suo score complessivo come
 \]
 
 Sia $\mathcal{A}(v,w)$ l'insieme di tutti i possibili allineamenti tra $v$ e $w$.
-Il \textbf{Global Alignment Problem} consiste nel determinare un allineamento di score massimo, ovvero
+Il \textbf{Global Alignment Problem} consiste nel determinare un allineamento di score massimo,
+\cite[pp.~177--180]{jones--pevzner}, ovvero
 \[
     \operatorname{OPT}(v,w) = \max_{A \in \mathcal{A}(v,w)} \operatorname{score}(A)
 \]
