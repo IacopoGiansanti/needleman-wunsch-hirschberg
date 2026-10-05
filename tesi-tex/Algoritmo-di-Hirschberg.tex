@@ -163,6 +163,21 @@ $e_{\mathrm{mid}}$ determina una singola colonna dell'allineamento complessivo.
 In questo modo Hirschberg non necessita di una matrice globale dei predecessori; le colonne dell'allineamento vengono prodotte
 progressivamente durante la ricorsione.
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[
+        width=0.85\textwidth
+    ]{figure/linear-space-sequence-alignment.pdf}
+    \caption{
+        Suddivisione ricorsiva dello spazio di allineamento
+        nell'algoritmo in spazio lineare.
+        Tratto da Jones e Pevzner~\cite[p.~235]{jones--pevzner}.
+    }
+    \label{fig:linear-space-alignment}
+\end{figure}
+
+\FloatBarrier
+
 Analizziamo un esempio per verificare ciò che abbiamo appena detto.
 Consideriamo le solite sequenze $v:=\texttt{ACCT}$ e $w:=\texttt{ACT}$.
 La colonna centrale è:
