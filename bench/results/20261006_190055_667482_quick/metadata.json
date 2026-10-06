@@ -1,0 +1,81 @@
+{
+  "started_at": "2026-10-06T17:00:55.668085+00:00",
+  "status": "completed",
+  "parameters": {
+    "profile": "quick",
+    "bench": "/home/iacop/tesi/bench/align_bench",
+    "manifest": "/home/iacop/tesi/bench/data/processed/manifest.json",
+    "out_dir": null,
+    "reps": 3,
+    "sizes": [
+      250,
+      500,
+      1000,
+      2000
+    ],
+    "modes": [
+      "random",
+      "mutated"
+    ],
+    "seed_base": 1000,
+    "mutation_rate": 0.05,
+    "nw_max_gib": 7,
+    "timeout": 0,
+    "no_rectangles": false
+  },
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+  "machine": "aarch64",
+  "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+  "cpuinfo": "processor\t: 0\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 1\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 2\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 3\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 4\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 5\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 6\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 7\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 8\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 9\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 10\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\nprocessor\t: 11\nBogoMIPS\t: 38.40\nFeatures\t: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 asimdfhm uscat ilrcpc flagm ssbs sb paca pacg dcpodp flagm2 frint i8mm bf16 rng afp rpres\nCPU implementer\t: 0x51\nCPU architecture: 8\nCPU variant\t: 0x1\nCPU part\t: 0x001\nCPU revision\t: 1\n\n",
+  "meminfo": "MemTotal:       10165856 kB\nMemFree:         9400752 kB\nMemAvailable:    9530444 kB\nBuffers:           12008 kB\nCached:           240120 kB\nSwapCached:            0 kB\nActive:           111168 kB\nInactive:         275020 kB\nActive(anon):       2600 kB\nInactive(anon):   136692 kB\nActive(file):     108568 kB\nInactive(file):   138328 kB\nUnevictable:           0 kB\nMlocked:               0 kB\nSwapTotal:       4194304 kB\nSwapFree:        4194304 kB\nZswap:                 0 kB\nZswapped:              0 kB\nDirty:               124 kB\nWriteback:            64 kB\nAnonPages:        134112 kB\nMapped:            93968 kB\nShmem:              5228 kB\nKReclaimable:      64832 kB\nSlab:             122892 kB\nSReclaimable:      64832 kB\nSUnreclaim:        58060 kB\nKernelStack:        4872 kB\nPageTables:         2704 kB\nSecPageTables:         0 kB\nNFS_Unstable:          0 kB\nBounce:                0 kB\nWritebackTmp:          0 kB\nCommitLimit:     9277232 kB\nCommitted_AS:     625392 kB\nVmallocTotal:   133141626880 kB\nVmallocUsed:       28748 kB\nVmallocChunk:          0 kB\nPercpu:             3600 kB\nHardwareCorrupted:     0 kB\nAnonHugePages:         0 kB\nShmemHugePages:        0 kB\nShmemPmdMapped:        0 kB\nFileHugePages:         0 kB\nFilePmdMapped:         0 kB\nCmaTotal:          16384 kB\nCmaFree:           10240 kB\nHugePages_Total:       0\nHugePages_Free:        0\nHugePages_Rsvd:        0\nHugePages_Surp:        0\nHugepagesize:       2048 kB\nHugetlb:               0 kB\n",
+  "swap": "Filename\t\t\t\tType\t\tSize\t\tUsed\t\tPriority\n/dev/sdc                                partition\t4194304\t\t0\t\t-2\n",
+  "build": {
+    "created_at": "2026-10-06T17:00:55.579773+00:00",
+    "command": "gcc -I../include -O2 -Wall -Wextra -Wpedantic -std=c99 benchmark.c bench_adapter.c ../src/alignment.c ../src/base.c ../src/fasta.c ../src/strand.c ../src/scoring.c ../src/middle_edge.c ../src/Needleman-Wunsch.c ../src/Hirschberg.c   -o align_bench",
+    "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+    "binary_sha256": "c4fc605f837c991c766fe57dfc379d007eee5ee73d8c28cf2a9839fc20fab578",
+    "sources": {
+      "benchmark.c": "1779ff4c2998bdda131f19f392cfd43db8902a44826a826a10a4ef1b1915e56f",
+      "bench_adapter.c": "c919462984b7a5a5bccc13154e2093e7034e619912a5316b829abf1008367203",
+      "../src/alignment.c": "da788ac1938e3d80095208ab735ced7e27300e259612c95d016c59dfeafc727d",
+      "../src/base.c": "a21f7572820b4ea2c2a5e4d3ee763e0f63a56102e1535ef8f195eedfb672a13e",
+      "../src/fasta.c": "2a0cfe0702a924f58b76226eb585957c2e81b0b07dc64b7348c3e8cccef20e0b",
+      "../src/strand.c": "9f29f6a3bb6052337faf8d59c387b2daec90df4b58153b16fc51602681144935",
+      "../src/scoring.c": "c40211b833cda43c76bd2dab258d980e2e9aedfd53b10be5342ca1a5567828c9",
+      "../src/middle_edge.c": "24b21d0b4700d9c509986ef2b05365f6bc68b5e27c23ac6c8642708a54e36aa4",
+      "../src/Needleman-Wunsch.c": "b45d342cbc0fa4051c9c8ad2f346b7a2e852d132101318153b701282c8ded64d",
+      "../src/Hirschberg.c": "f94cba6fb1ea6d5cb647e830eb317db58d13825738a091a671a1364687bc6898",
+      "../include/Hirschberg.h": "56b76d214468d25323073e0aa34da68ccaa625f18a9d5536322d660b346c3406",
+      "../include/Needleman-Wunsch.h": "cec9448aaccc7d23ce406e414b2997e0c4e06ba1989d3b38773a91bb4728f0f7",
+      "../include/alignment.h": "72aac0425975f1af5400731c0be40f0942e9fa0a19a15b6862f06025a9fb8063",
+      "../include/base.h": "674ca1e610036b49a28a57a4525fc5c91067992e55fe47b3431001b02666dea7",
+      "../include/direction.h": "d8e705823e8f76b11382b1d8c857236bbfb5937f7ff1b2001c924b86b89b4601",
+      "../include/fasta.h": "0dba846efa2a38d783cc3278e000d67d826d5e0b452e0276ada3fd0eb14bc68f",
+      "../include/middle_edge.h": "d27ddc073f886739cd0873e1fe46d3ef548b0db0d522cfe96579172836ced8b8",
+      "../include/scoring.h": "a41e91ccaf94cfd875b734b4f26f09884f63693301bf83ed66feca5a78988c48",
+      "../include/strand.h": "f15ba7c5cf610bc381eb4908f2f6ecc662d3fd08df3c076f6256663b911bc097",
+      "bench_adapter.h": "1d87d83dacb22bee6bc5a2261f08bd54f58d24f4bc844ffb1ca5e115f6621cde"
+    }
+  },
+  "abi": {
+    "int_bytes": 4,
+    "direction_bytes": 1,
+    "base_bytes": 1
+  },
+  "scoring": {
+    "match": 1,
+    "mismatch": -1,
+    "gap": -1
+  },
+  "gnu_time": "time (GNU Time) UNKNOWN\nCopyright (C) 2018 Free Software Foundation, Inc.\nLicense GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n\nWritten by David Keppel, David MacKenzie, and Assaf Gordon.\n",
+  "scripts_sha256": {
+    "check_scores.py": "bc38c560cd8ae0018ce87d24388425a0f748b8ef2b936953f835507c3061c436",
+    "prepare_fasta.py": "3efb2fe89db359a102127fe47796be5bd1af9cb7773e6ffea3ff0a6be0df6cb5",
+    "record_build.py": "0a38522a98e5181185e98168e2c4d739c95ce26545788c9fa29cfc3db61ad55c",
+    "run_benchmark.py": "465675bbee41a9b316cbed1537a09b536d4b766b0d7b463a65c4dd5d0707610b",
+    "summarize.py": "c09c999f9b03fff57950af14fe4e43d1da622ac36b3f032778929e37eacbe7ed"
+  },
+  "planned_pairs": 30,
+  "real_manifest": null,
+  "finished_at": "2026-10-06T17:00:57.099884+00:00"
+}

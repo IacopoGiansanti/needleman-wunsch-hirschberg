@@ -1,0 +1,5 @@
+dataset_id,file1,file2
+rrna16s,NR_112059.1.fasta,NR_116005.1.fasta
+hiv1,NC_001802.1.fasta,U46016.1.fasta
+sars_cov2,NC_045512.2.fasta,OK091006.1.fasta
+plastidi,NC_000932.1.fasta,NC_001320.1.fasta

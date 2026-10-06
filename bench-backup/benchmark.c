@@ -1,8 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include <errno.h>
-#include <limits.h>
-#include <math.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -11,8 +9,6 @@
 #include <time.h>
 
 #include "alignment.h"
-#include "direction.h"
-#include "fasta.h"
 #include "base.h"
 #include "scoring.h"
 #include "strand.h"
@@ -26,8 +22,7 @@ typedef enum {
 typedef enum {
     INPUT_RANDOM,
     INPUT_IDENTICAL,
-    INPUT_MUTATED,
-    INPUT_FASTA
+    INPUT_MUTATED
 } InputMode;
 
 static double clock_seconds(clockid_t id) {
@@ -87,7 +82,7 @@ static size_t parse_size(const char *text, const char *name) {
     char *end = NULL;
     unsigned long long value = strtoull(text, &end, 10);
 
-    if(errno != 0 || end == text || *end != '\0' || value == 0 || value > SIZE_MAX || strspn(text, "0123456789") != strlen(text)) {
+    if(errno != 0 || end == text || *end != '\0' || value == 0) {
         fprintf(stderr, "%s non valido: %s\n", name, text);
         exit(EXIT_FAILURE);
     }
@@ -100,7 +95,7 @@ static uint64_t parse_u64(const char *text, const char *name) {
     char *end = NULL;
     unsigned long long value = strtoull(text, &end, 10);
 
-    if(errno != 0 || end == text || *end != '\0' || strspn(text, "0123456789") != strlen(text)) {
+    if(errno != 0 || end == text || *end != '\0') {
         fprintf(stderr, "%s non valido: %s\n", name, text);
         exit(EXIT_FAILURE);
     }
@@ -113,7 +108,7 @@ static double parse_rate(const char *text) {
     char *end = NULL;
     double value = strtod(text, &end);
 
-    if(errno != 0 || end == text || *end != '\0' || !isfinite(value) || value < 0.0 || value > 1.0) {
+    if(errno != 0 || end == text || *end != '\0' || value < 0.0 || value > 1.0) {
         fprintf(stderr, "mutation_rate deve appartenere a [0, 1]\n");
         exit(EXIT_FAILURE);
     }
@@ -154,7 +149,6 @@ static const char *mode_name(InputMode mode) {
         case INPUT_RANDOM:    return "random";
         case INPUT_IDENTICAL: return "identical";
         case INPUT_MUTATED:   return "mutated";
-        case INPUT_FASTA:     return "fasta";
     }
     return "unknown";
 }
@@ -204,82 +198,55 @@ static int alignment_is_valid(const Alignment *alignment,
 
 static void usage(const char *program) {
     fprintf(stderr,
-        "Uso:\n"
-        "  %s ALGORITHM N M SEED MODE [MUTATION_RATE] [--swap]\n"
-        "  %s ALGORITHM --fasta FIRST.fasta SECOND.fasta\n"
-        "  %s --abi\n"
-        "ALGORITHM: nw | hirschberg; MODE: random | identical | mutated\n"
-        "FASTA: singolo record ACGT, gia' preprocessato.\n"
-        "--swap: scambia gli input DOPO la generazione.\n",
-        program, program, program);
-}
-
-static void validate_dimensions(size_t n, size_t m, Algorithm algorithm) {
-    /* Le implementazioni originali usano score int e allocazioni size_t. */
-    if(n > INT_MAX || m > INT_MAX || n > (size_t)INT_MAX - m ||
-       n + m > SIZE_MAX / sizeof(Base)) {
-        fprintf(stderr, "Input troppo grande per gli score int\n");
-        exit(EXIT_FAILURE);
-    }
-    if(algorithm == ALG_NW &&
-       ((n + 1) > SIZE_MAX / (m + 1) ||
-        (n + 1) * (m + 1) > SIZE_MAX / sizeof(int) ||
-        (n + 1) * (m + 1) > SIZE_MAX / sizeof(Direction))) {
-        fprintf(stderr, "Dimensioni delle matrici non rappresentabili\n");
-        exit(EXIT_FAILURE);
-    }
+            "Uso:\n"
+            "  %s ALGORITHM N M SEED MODE [MUTATION_RATE]\n\n"
+            "ALGORITHM:\n"
+            "  nw | hirschberg\n\n"
+            "MODE:\n"
+            "  random     due sequenze indipendenti\n"
+            "  identical  sequenze identiche (richiede N=M)\n"
+            "  mutated    seconda sequenza derivata dalla prima (richiede N=M)\n\n"
+            "Esempi:\n"
+            "  %s nw 5000 5000 42 random\n"
+            "  %s hirschberg 5000 5000 42 mutated 0.05\n",
+            program, program, program);
 }
 
 int main(int argc, char **argv) {
-    if(argc == 2 && strcmp(argv[1], "--abi") == 0) {
-        printf("{\"int_bytes\":%zu,\"direction_bytes\":%zu,\"base_bytes\":%zu}\n",
-               sizeof(int), sizeof(Direction), sizeof(Base));
-        return EXIT_SUCCESS;
+    if(argc < 6 || argc > 7) {
+        usage(argv[0]);
+        return EXIT_FAILURE;
     }
-    if(argc < 3) { usage(argv[0]); return EXIT_FAILURE; }
+
     Algorithm algorithm = parse_algorithm(argv[1]);
-    uint64_t seed = 0;
-    double mutation_rate = 0.0;
-    InputMode mode;
-    Strand *v, *w;
-    size_t n, m;
-    if(strcmp(argv[2], "--fasta") == 0) {
-        if(argc != 5) { usage(argv[0]); return EXIT_FAILURE; }
-        mode = INPUT_FASTA;
-        v = fasta_read_strand(argv[3]);
-        w = fasta_read_strand(argv[4]);
-        n = v->length;
-        m = w->length;
-        validate_dimensions(n, m, algorithm);
-    } else {
-        int swap = argc > 3 && strcmp(argv[argc - 1], "--swap") == 0;
-        int count = argc - swap;
-        if(count < 6 || count > 7) { usage(argv[0]); return EXIT_FAILURE; }
-        n = parse_size(argv[2], "N");
-        m = parse_size(argv[3], "M");
-        validate_dimensions(n, m, algorithm);
-        seed = parse_u64(argv[4], "SEED");
-        mode = parse_mode(argv[5]);
-        double requested_rate = count == 7 ? parse_rate(argv[6]) : 0.05;
-        mutation_rate = mode == INPUT_MUTATED ? requested_rate : 0.0;
-        if((mode == INPUT_IDENTICAL || mode == INPUT_MUTATED) && n != m) {
-            fprintf(stderr, "La modalita' %s richiede N=M\n", mode_name(mode));
-            return EXIT_FAILURE;
-        }
-        uint64_t state = seed ? seed : UINT64_C(0x9e3779b97f4a7c15);
-        v = strand_create(n);
-        w = strand_create(m);
-        fill_random(v, &state);
-        switch(mode) {
-            case INPUT_RANDOM: fill_random(w, &state); break;
-            case INPUT_IDENTICAL: memcpy(w->bases, v->bases, n * sizeof(Base)); break;
-            case INPUT_MUTATED: fill_mutated(w, v, mutation_rate, &state); break;
-            case INPUT_FASTA: break;
-        }
-        if(swap) {
-            Strand *tmp = v; v = w; w = tmp;
-            n = v->length; m = w->length;
-        }
+    size_t n = parse_size(argv[2], "N");
+    size_t m = parse_size(argv[3], "M");
+    uint64_t seed = parse_u64(argv[4], "SEED");
+    InputMode mode = parse_mode(argv[5]);
+    double mutation_rate = argc == 7 ? parse_rate(argv[6]) : 0.05;
+
+    if((mode == INPUT_IDENTICAL || mode == INPUT_MUTATED) && n != m) {
+        fprintf(stderr, "La modalita' %s richiede N=M\n", mode_name(mode));
+        return EXIT_FAILURE;
+    }
+
+    uint64_t state = seed ? seed : UINT64_C(0x9e3779b97f4a7c15);
+
+    Strand *v = strand_create(n);
+    Strand *w = strand_create(m);
+
+    fill_random(v, &state);
+
+    switch(mode) {
+        case INPUT_RANDOM:
+            fill_random(w, &state);
+            break;
+        case INPUT_IDENTICAL:
+            memcpy(w->bases, v->bases, n * sizeof(Base));
+            break;
+        case INPUT_MUTATED:
+            fill_mutated(w, v, mutation_rate, &state);
+            break;
     }
 
     const scoringModel model = {

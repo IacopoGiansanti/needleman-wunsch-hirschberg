@@ -1,63 +1,69 @@
 #!/usr/bin/env python3
-
+"""Verifica ogni ripetizione, senza sovrascrivere istanze o nascondere invalidi."""
 import csv
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 
-input_path = sys.argv[1] if len(sys.argv) > 1 else "results/results.csv"
 
-instances = defaultdict(dict)
-invalid = []
-failed = []
+def assess(rows):
+    issues = []
+    pairs = defaultdict(dict)
+    statuses = Counter()
+    for line, row in enumerate(rows, 2):
+        status = row['status']
+        statuses[status] += 1
+        key = (row.get('pair_id') or (row.get('dataset_id', ''), row['n'], row['m'],
+               row['seed'], row['input_mode'], row['mutation_rate'],
+               row.get('rep', ''), row.get('orientation', '')))
+        alg = row['algorithm']
+        if alg not in ('nw', 'hirschberg'):
+            issues.append(f'riga {line}: algoritmo sconosciuto')
+        if alg in pairs[key]:
+            issues.append(f'riga {line}: duplicato {key} / {alg}')
+        pairs[key][alg] = row
+        if status != 'ok' and status != 'skipped_memory_budget':
+            issues.append(f'riga {line}: {status}')
+        if status == 'ok' and row['valid'] != '1':
+            issues.append(f'riga {line}: allineamento non valido')
+        if status == 'score_mismatch' or row.get('score_check') == 'mismatch':
+            issues.append(f'riga {line}: score discordanti')
+    paired = unpaired = 0
+    for key, pair in pairs.items():
+        if set(pair) != {'nw', 'hirschberg'}:
+            issues.append(f'{key}: risultato di un algoritmo mancante')
+        good = [r for r in pair.values() if r['status'] == 'ok' and r['valid'] == '1']
+        if len(pair) == 2:
+            a, b = pair.values()
+            for field in ('n', 'm', 'seed', 'input_mode', 'mutation_rate', 'dataset_id',
+                          'rep', 'orientation', 'input1_sha256', 'input2_sha256'):
+                if a.get(field, '') != b.get(field, ''):
+                    issues.append(f'{key}: metadati diversi ({field})')
+        if len(good) == 2:
+            paired += 1
+            if int(good[0]['score']) != int(good[1]['score']):
+                issues.append(f'{key}: score diversi')
+        else:
+            unpaired += len(good)
+    if not rows:
+        issues.append('nessuna esecuzione registrata')
+    return issues, paired, unpaired, statuses
 
-with open(input_path, newline="") as f:
-    for row in csv.DictReader(f):
-        status = row["status"]
-        if status != "ok":
-            failed.append(row)
-            continue
 
-        if row["valid"] != "1":
-            invalid.append(row)
-            continue
+def main():
+    path = sys.argv[1] if len(sys.argv) > 1 else 'results/results.csv'
+    with open(path, newline='') as f:
+        rows = list(csv.DictReader(f))
+    issues, paired, unpaired, statuses = assess(rows)
+    print(f'Coppie NW/Hirschberg confrontate: {paired}')
+    print(f'Esecuzioni valide senza confronto score: {unpaired}')
+    print(f'Stati: {dict(statuses)}')
+    if issues:
+        for message in issues[:20]:
+            print('ERRORE:', message)
+        return 1
+    print('Controlli superati; i casi non confrontati non certificano da soli l’ottimalità.')
+    return 0
 
-        key = (
-            int(row["n"]),
-            int(row["m"]),
-            int(row["seed"]),
-            row["input_mode"],
-            float(row["mutation_rate"]),
-        )
-        instances[key][row["algorithm"]] = int(row["score"])
 
-mismatches = []
-paired = 0
-
-for key, scores in instances.items():
-    if "nw" in scores and "hirschberg" in scores:
-        paired += 1
-        if scores["nw"] != scores["hirschberg"]:
-            mismatches.append((key, scores))
-
-if invalid:
-    print(f"ERRORE: {len(invalid)} allineamenti non validi.")
-
-if mismatches:
-    print(f"ERRORE: {len(mismatches)} istanze con score ottimi diversi:")
-    for key, scores in mismatches[:20]:
-        print(" ", key, scores)
-
-print(f"Istanze confrontabili NW/Hirschberg: {paired}")
-print(f"Esecuzioni fallite/OOM registrate  : {len(failed)}")
-
-if failed:
-    by_alg = defaultdict(int)
-    for row in failed:
-        by_alg[row["algorithm"]] += 1
-    print("Failure per algoritmo:", dict(by_alg))
-
-if invalid or mismatches:
-    sys.exit(1)
-
-print("OK: tutti gli score confrontabili coincidono e gli allineamenti sono validi.")
-
+if __name__ == '__main__':
+    sys.exit(main())

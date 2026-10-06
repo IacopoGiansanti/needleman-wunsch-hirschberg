@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-10-06T17:00:55.579773+00:00",
+  "command": "gcc -I../include -O2 -Wall -Wextra -Wpedantic -std=c99 benchmark.c bench_adapter.c ../src/alignment.c ../src/base.c ../src/fasta.c ../src/strand.c ../src/scoring.c ../src/middle_edge.c ../src/Needleman-Wunsch.c ../src/Hirschberg.c   -o align_bench",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nCopyright (C) 2023 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "binary_sha256": "c4fc605f837c991c766fe57dfc379d007eee5ee73d8c28cf2a9839fc20fab578",
+  "sources": {
+    "benchmark.c": "1779ff4c2998bdda131f19f392cfd43db8902a44826a826a10a4ef1b1915e56f",
+    "bench_adapter.c": "c919462984b7a5a5bccc13154e2093e7034e619912a5316b829abf1008367203",
+    "../src/alignment.c": "da788ac1938e3d80095208ab735ced7e27300e259612c95d016c59dfeafc727d",
+    "../src/base.c": "a21f7572820b4ea2c2a5e4d3ee763e0f63a56102e1535ef8f195eedfb672a13e",
+    "../src/fasta.c": "2a0cfe0702a924f58b76226eb585957c2e81b0b07dc64b7348c3e8cccef20e0b",
+    "../src/strand.c": "9f29f6a3bb6052337faf8d59c387b2daec90df4b58153b16fc51602681144935",
+    "../src/scoring.c": "c40211b833cda43c76bd2dab258d980e2e9aedfd53b10be5342ca1a5567828c9",
+    "../src/middle_edge.c": "24b21d0b4700d9c509986ef2b05365f6bc68b5e27c23ac6c8642708a54e36aa4",
+    "../src/Needleman-Wunsch.c": "b45d342cbc0fa4051c9c8ad2f346b7a2e852d132101318153b701282c8ded64d",
+    "../src/Hirschberg.c": "f94cba6fb1ea6d5cb647e830eb317db58d13825738a091a671a1364687bc6898",
+    "../include/Hirschberg.h": "56b76d214468d25323073e0aa34da68ccaa625f18a9d5536322d660b346c3406",
+    "../include/Needleman-Wunsch.h": "cec9448aaccc7d23ce406e414b2997e0c4e06ba1989d3b38773a91bb4728f0f7",
+    "../include/alignment.h": "72aac0425975f1af5400731c0be40f0942e9fa0a19a15b6862f06025a9fb8063",
+    "../include/base.h": "674ca1e610036b49a28a57a4525fc5c91067992e55fe47b3431001b02666dea7",
+    "../include/direction.h": "d8e705823e8f76b11382b1d8c857236bbfb5937f7ff1b2001c924b86b89b4601",
+    "../include/fasta.h": "0dba846efa2a38d783cc3278e000d67d826d5e0b452e0276ada3fd0eb14bc68f",
+    "../include/middle_edge.h": "d27ddc073f886739cd0873e1fe46d3ef548b0db0d522cfe96579172836ced8b8",
+    "../include/scoring.h": "a41e91ccaf94cfd875b734b4f26f09884f63693301bf83ed66feca5a78988c48",
+    "../include/strand.h": "f15ba7c5cf610bc381eb4908f2f6ecc662d3fd08df3c076f6256663b911bc097",
+    "bench_adapter.h": "1d87d83dacb22bee6bc5a2261f08bd54f58d24f4bc844ffb1ca5e115f6621cde"
+  }
+}
