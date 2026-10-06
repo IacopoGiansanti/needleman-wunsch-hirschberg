@@ -289,7 +289,7 @@ e non soltanto il suo valore, mantenendo una complessità spaziale lineare.
 
 \subsection{Implementazione}
 
-L'algoritmo di Needleman--Wunsch è stato implementato in C mantenendo una corrispondenza diretta tra gli oggetti introdotti nella
+L'algoritmo di Needleman--Wunsch è stato implementato in linguaggio C mantenendo una corrispondenza diretta tra gli oggetti introdotti nella
 formulazione teorica e le strutture dati utilizzate nel programma.
 In questa sezione vengono descritte le principali scelte implementative rilevanti ai fini del confronto sperimentale.
 
@@ -323,7 +323,7 @@ nel codice \texttt{v->bases[i-1]}, e analogamente $w_{j}$ corrisponde a \texttt{
 %          &\texttt{\} scoringModel;}
 %       \end{aligned}
 %   \]
-Nel programma è stato utilizzato il seguente modello di scoring:
+Nel programma è stato utilizzato il seguente modello di scoring di default:
 \[
     \texttt{match } = 1, \qquad \texttt{mismatch } = -1, \qquad \texttt{indel } = -1.
 \]
@@ -332,7 +332,8 @@ La funzione
 \[
     \texttt{scoring(a,b,model)}
 \]
-implementa la funzione di scoring teorica $\delta(a,b)$.
+implementa la funzione di scoring teorica $\delta(a,b)$;
+il parametro \texttt{model} permette di specificare un diverso modello di scoring.
 
 L'implementazione alloca due matrici, \texttt{score} e \texttt{pred}, entrambe di dimensione $(n+1) \times (m+1)$.
 La prima memorizza gli score $S_{i,j}$ associati agli stati della programmazione dinamica, mentre la seconda memorizza le informazioni relative ai predecessori. 

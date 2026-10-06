@@ -11,17 +11,17 @@ ridotto a
 
 Questa ottimizzazione, tuttavia, non permette direttamente di ricostruire un
 allineamento ottimo, poiché le informazioni necessarie al traceback vengono
-progressivamente eliminate.
+progressivamente eliminate prima che possano essere utilizzate.
 
-L'algoritmo proposto da Hirschberg \cite{hirschberg} nasce nel conteso del problema della Longest Common Subsequence e utilizza
-una strategia divide et impera per consentire la ricostruzione della soluzione in sazio lineare.
+L'algoritmo proposto da Hirschberg \cite{hirschberg} nasce nel contesto del problema della Longest Common Subsequence e utilizza
+una strategia divide et impera per consentire la ricostruzione della soluzione in spazio lineare.
 Nel seguito consideriamo la corrispondente formulazione per il problema dell'allineamento globale di sequenze \cite[Sec.~7.2]{jones--pevzner}.
 
 L'obiettivo è mantenere una complessità spaziale lineare, ricostruendo comunque un allineamento associato allo score massimo.
 
 Per ottenere questo risultato, Hirschberg combina il calcolo degli score in spazio
 lineare con una strategia \emph{divide et impera} applicata all'alignment graph.
-Consideriamo infatti un cammino ottimo da $(0,0)$ a $(n,m)$. Tale cammino deve
+Consideriamo infatti un cammino ottimo da $(0,0)$ (sorgente) a $(n,m)$ (pozzo). Tale cammino deve
 attraversare la colonna centrale del grafo,
 \[
     j_{\mathrm{mid}} = \left\lfloor\frac{m}{2}\right\rfloor.
@@ -30,7 +30,7 @@ attraversare la colonna centrale del grafo,
 Se riusciamo quindi a individuare un vertice della colonna $j_{\mathrm{mid}}$
 appartenente ad almeno un cammino ottimo, possiamo suddividere il problema in due
 sottoproblemi: la ricerca di un cammino ottimo dalla sorgente a tale vertice e la
-ricerca di un cammino ottimo dal vertice al sink \cite[pp.~232--234]{jones--pevzner}.
+ricerca di un cammino ottimo dal vertice al pozzo \cite[pp.~232--234]{jones--pevzner}.
 
 Applicando ricorsivamente questa procedura è possibile ricostruire il cammino
 ottimo senza memorizzare l'intera matrice dei predecessori.
@@ -39,6 +39,18 @@ Nella formulazione utilizzata nel seguito, l'algoritmo individua non soltanto un
 vertice centrale, detto \emph{middle vertex}, ma anche un arco ottimo uscente da
 esso, detto \emph{middle edge}. Tale arco permette di determinare una colonna
 dell'allineamento e di separare precisamente i due sottoproblemi ricorsivi.
+
+È importante sottolineare che il middle edge è una scelta formulativa dell'algoritmo.
+La formulazione originale di Hirschberg e la presentazione di Jones e Pevzner \cite{hirschberg,jones--pevzner} effettuano
+infatti la decomposizione utilizzando il solo middle vertex: una volta individuato un vertice centrale
+appartenente a un cammino ottimo, si risolvono ricorsivamente i sottoproblemi posti prima e dopo tale vertice.
+
+La formulazione basata sul middle edge, adottata nel seguito
+costituisce una variante della stessa strategia. Selezionando anche un arco ottimo uscente dal middle vertex, una colonna
+dell'allineamento viene determinata immediatamente e i due sottoproblemi possono essere posti strettamente prima e dopo tale arco.
+La loro area complessiva risulta pertanto leggermente inferiore rispetto alla decomposizione basata sul solo vertice \cite[pp.~275--276]{compeau--pevzner}.
+Tale vantaggio riguarda tuttavia soltanto i fattori costanti: entrambe le formulazioni mantengono tempo $\Theta(nm)$ e spazio lineare.
+Non ne segue quindi, in generale, una maggiore efficienza pratica, che dipende dal costo necessario per individuare il middle edge.
 
 \subsection{Ricorrenza, Middle vertex e Middle edge}
 
@@ -91,15 +103,15 @@ Vogliamo determinare quale di questi vertici appartiene ad almeno un cammino ott
 
 Per ogni $i \in \{ 0,\ldots,n \}$ definiamo
 \[
-    \operatorname{prefix}(i) = \operatorname{OPT} \left[(0,0)\rightarrow(i,j_{\mathrm{mid}}) \right],
+    \operatorname{prefix}(i)
 \]
-ossia lo score del miglior cammino dalla sorgente al vertice $(i,j_{\mathrm{mid}})$.
+come lo score del miglior cammino dalla sorgente $(0,0)$ al vertice $(i,j_{\mathrm{mid}})$.
 
 In maniera analoga, definiamo
 \[
-    \operatorname{suffix}(i) = \operatorname{OPT} \left[(i,j_{\mathrm{mid}})\rightarrow(n,m) \right],
+    \operatorname{suffix}(i)
 \]
-ossia lo score del miglior cammino del medesimo vertice al sink.
+come lo score del miglior cammino dal vertice $(i,j_{\mathrm{mid}})$ al pozzo $(n,m)$.
 
 Definiamo quindi
 \[
@@ -138,15 +150,16 @@ Una volta determinato il middle vertex rimane da individuare quale arco uscente 
 Dal middle vertex possono partire al più tre archi, corrispondenti alle tre operazioni dell'allineamento.
 
 Sia $R(i,j)$ lo score del miglior cammino dal vertice $(i,j)$ al pozzo.
-Sia $e$ l'arco avente come coda il middle vertex, allora definiamo i tre valori candidati
+Siano $e_{\downarrow},e_{\rightarrow},e_{\searrow}$ sono i tre archi (se esistono) che hanno come coda il vertice $(i,j)$.
+Allora, definiamo il costo degli archi appena definiti 
 \[
     \begin{aligned}
         & c(e_{\downarrow}) = \delta( v_{i+1}, -) + R(i+1,j),\\
         & c(e_{\rightarrow}) = \delta(-, w_{j+1}) + R(i,j+1),\\
-        & c(e_{\searrow}) = \delta( v_{i+1}, w_{j+1}) + R(i+1,j+1).
+        & c(e_{\searrow}) = \delta( v_{i+1}, w_{j+1}) + R(i+1,j+1),
     \end{aligned}
 \]
-Allora, il middle edge viene scelto tra gli archi che massimizzano tali quantità.
+Il middle edge è l'arco che massimizza il costo; in caso di pareggio bisognerà introdurre una politica deterministica per la scelta dell'arco.
 
 Il termine relativo al cammino dalla sorgente al middle vertex non compare nel confronto, poiché è lo stesso per tutti gli archi uscenti da tale vertice.
 È quindi sufficiente confrontare il peso dell'arco con lo score ottimo del cammino che parte dal suo estremo finale.
@@ -281,12 +294,13 @@ NWScore(v,w,top,bottom,left,right,delta)
 \end{lstlisting}
 Al termine della procedura,
 \[
-    \texttt{previous}[i] = \operatorname{OPT}\left[(\texttt{top},\texttt{left})\rightarrow(i,\texttt{right})\right],
+    \texttt{previous}[i]
 \]
+rappresenta lo score del cammino ottimo dalla sorgente del sottoproblema $(\texttt{top},\texttt{left})$ al vertice $(i,\texttt{right})$,
 per ogni $i \in \{ \texttt{top},\ldots,\texttt{bottom} \}$.
 
-Possiamo notare che, quando $\texttt{right} = j_{\mathrm{mid}}$, questo vettore contiene esattamente
-i valori che in precedenza chiamavamo $\operatorname{prefix}(i)$.
+Possiamo notare che in particolare, quando $\texttt{right} = j_{\mathrm{mid}}$, questo vettore contiene esattamente
+i valori che in precedenza chiamavamo $\operatorname{prefix}(i)$, relativi al sottoproblema corrente.
 
 Per il calcolo dei valori $\operatorname{suffix}(i)$ utilizziamo una procedura simmetrica
 \[
@@ -294,10 +308,12 @@ Per il calcolo dei valori $\operatorname{suffix}(i)$ utilizziamo una procedura s
 \]
 che visita il rettangolo a partire dal pozzo.
 
-In questo caso il vettore soddisfa
+In questo caso
 \[
-    \texttt{previous}[i] = \operatorname{OPT}\left[(i,\texttt{left})\rightarrow(\texttt{bottom},\texttt{right})\right].
+    \texttt{previous}[i]
 \]
+rappresenta lo score del cammino ottimo dal vertice $(i,\texttt{left})$ al pozzo del sottoproblema $(\texttt{bottom},\texttt{right})$,
+per ogni $i \in \{ \texttt{top},\ldots,\texttt{bottom} \}$.
 
 \begin{lstlisting}[style=pseudo,caption={Calcolo inverso degli score}]
 NWScoreReverse(v,w,top,bottom,left,right,delta)
@@ -453,6 +469,9 @@ costante dovuto alle scansioni necessarie per ogni sottoproblema, dalla serie ge
 \[
     A_{0} + \frac{A_{0}}{2} + \frac{A_{0}}{4} + \cdots = \sum^{\infty}_{\ell = 0}\frac{A_{0}}{2^{\ell}}=2 A_{0}.
 \]
+L'uso del middle edge riduce leggermente l'area dei sottoproblemi rispetto alla variante basata sul solo middle vertex,
+senza modificare il limite asintotico. Nella presente implementazione, inoltre, la determinazione dell'arco richiede il calcolo
+aggiuntivo di \texttt{suffix\_next}; non è quindi possibile dedurre a priori un vantaggio temporale pratico dalla sola riduzione dell'area ricorsiva.
 
 Ne segue che
 \[
@@ -593,7 +612,7 @@ di seguito è possibile vederne il codice.
 
 \begin{lstlisting}[language=C]
 previous[n] = 0;
-for(size_t i = n; i --> 0; ) {
+for(size_t i = n; i-- > 0; ) {
     previous[i] = previous[i+1] + scoring(v->bases[v_source + i], BASE_GAP, model);
 }
 \end{lstlisting}
@@ -601,9 +620,9 @@ for(size_t i = n; i --> 0; ) {
 È interessante anche vedere come è stata affrontata l'indicizzazione dei cicli
 nel verso contrario:
 \begin{lstlisting}[language=C]
-for(size_t j = m; j --> 0; ) {
+for(size_t j = m; j-- > 0; ) {
     [...]
-    for(size_t i = n; i --> 0; ) {
+    for(size_t i = n; i-- > 0; ) {
         [...]
     }
 }
@@ -729,5 +748,3 @@ dinamica hanno sempre dimensione
     \min\{n,m\}+1,
 \]
 realizzando concretamente il limite spaziale discusso nella Sezione~\ref{sec:NW-complessità}.
-
-% !TeX root = main.tex
