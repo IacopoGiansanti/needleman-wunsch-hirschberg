@@ -54,6 +54,9 @@ results/*.csv
 bench/align_bench
 bench/results/*.csv
 bench/results/errors.log
+bench/tests
+bench/data
+bench/__pycache__
 
 # Visualization
 tools/alignment_dump

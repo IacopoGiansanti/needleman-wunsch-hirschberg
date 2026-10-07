@@ -1,6 +1,6 @@
 # Benchmark Needleman–Wunsch / Hirschberg
 
-Versione 2026-10-06. Confronto con scoring match +1, mismatch −1, gap −1.
+Versione 2026-10-06, revisione IUPAC v2. Confronto con scoring match +1, mismatch −1, gap −1.
 I file `src/` e `include/` sono quelli originali: gli algoritmi, lo scambio interno
 in Hirschberg e il parser FASTA della libreria non sono modificati.
 
@@ -62,17 +62,22 @@ make -C bench prepare
 
 Il preprocessing:
 
-- accetta A, C, G, T e N, anche minuscoli, sequenze su più righe e spazi bianchi;
-- rifiuta record multipli, sequenze vuote e altre ambiguità IUPAC (R, Y, ecc.);
+- accetta ACGT e le ambiguità DNA IUPAC RYSWKMBDHVN, anche minuscole,
+  sequenze su più righe e spazi bianchi;
+- rifiuta record multipli, sequenze vuote e simboli estranei (U, X, gap, ecc.);
 - lascia invariati i file originali;
-- sostituisce esclusivamente le N, scegliendo una base tra A, C, G, T;
+- risolve ciascuna ambiguità scegliendo pseudocasualmente una base ammessa:
+  R=AG, Y=CT, S=CG, W=AT, K=GT, M=AC, B=CGT, D=AGT, H=ACT, V=ACG, N=ACGT;
+  conserva le basi già determinate e la lunghezza della sequenza;
 - usa xorshift64* con seed principale predefinito `20261006`;
 - deriva il seed di ogni file dai primi 8 byte big-endian di
   `SHA256(str(seed_principale) + ':' + sha256_file_originale)`, così l'ordine
   dei dataset non cambia il preprocessing; seed zero usa lo stato non nullo
   `0x9e3779b97f4a7c15`;
 - scrive FASTA ACGT in `bench/data/processed/` e `manifest.json` con intestazioni,
-  lunghezze, numero di N sostituite, seed e hash SHA-256 originali/preprocessati.
+  lunghezze, numero di N sostituite, conteggi per ogni simbolo ambiguo
+  (`ambiguity_counts`), totale risolto (`ambiguity_replaced`), seed e hash SHA-256
+  originali/preprocessati. Il metodo è identificato come `xorshift64star-IUPAC-v2`.
 
 Il runner verifica hash, alfabeto e lunghezze prima delle misure e riusa gli stessi
 file in tutte le ripetizioni. I seed di preprocessing sono nel manifest; nella
@@ -85,6 +90,11 @@ esistente non viene sovrascritta. Per una seconda preparazione scegliere un'altr
 python3 bench/prepare_fasta.py --seed 20261006 --out bench/data/processed_v2
 python3 bench/run_benchmark.py real --manifest bench/data/processed_v2/manifest.json
 ```
+
+IUPAC: https://www.insdc.org/submitting-standards/feature-table/ (sezione 7.4.1).
+La risoluzione è una convenzione sperimentale, non ricostruisce la base biologica
+ignota. Per file contenenti solo ACGTN conserva il risultato della versione v1
+a parità di byte originali e seed.
 
 Non aggiungere BASE_N e non cambiare lo scoring: il preprocessamento è esterno
 agli algoritmi. Lo score dei dati reali serve al confronto algoritmico, non a
@@ -276,6 +286,10 @@ Il comando C produce dieci colonne senza header; è il runner ad aggiungere RSS,
 stato e metadati. Eseguire il binario da solo non sostituisce la campagna.
 
 ## Collegamento con il capitolo 4
+
+Nel capitolo 4 descrivere la risoluzione dei simboli ambigui IUPAC, includendo
+N: ogni simbolo viene sostituito con una delle basi ammesse, usando seed fissati
+in un preprocessing escluso dai tempi.
 
 Il codice realizza il protocollo discusso: 7 istanze sintetiche per configurazione,
 7 ripetizioni FASTA, ordine alternato, preprocessing una volta sola, tempo della

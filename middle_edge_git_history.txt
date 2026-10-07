@@ -1,0 +1,135 @@
+===== STATUS =====
+ M bench/README.md
+ M bench/__pycache__/prepare_fasta.cpython-312.pyc
+ M bench/build.json
+ M bench/prepare_fasta.py
+?? bench/campagna_all_data.zip
+?? bench/data/processed/
+?? bench/results/20261007_114931_641682_all/
+?? middle_edge_git_history.txt
+
+===== SHA256 CURRENT FILE =====
+24b21d0b4700d9c509986ef2b05365f6bc68b5e27c23ac6c8642708a54e36aa4  src/middle_edge.c
+
+===== HISTORY =====
+5822617aec9c8cc2738bba08b9b338a3d4a010db | 2026-10-05 13:02:57 +0200 | IacopoGiansanti | Hirschberg and Metodologia-sperimentale
+de965399d107be08f463a3402417c134489de278 | 2026-09-23 18:11:18 +0200 | IacopoGiansanti | added folder for better structure
+69194252edfdb7ad7715c34da9ded24e94d8792d | 2026-09-22 16:42:28 +0200 | IacopoGiansanti | Implemented Hirschberg and Needleman-Wunsch algorithm for the Global Alignment Problem
+
+===== UNCOMMITTED DIFF =====
+
+===== STAGED DIFF =====
+
+===== COMPLETE PATCH HISTORY =====
+commit 5822617aec9c8cc2738bba08b9b338a3d4a010db
+Author: IacopoGiansanti <iac.giansanti@stud.uniroma3.it>
+Date:   Mon Oct 5 13:02:57 2026 +0200
+
+    Hirschberg and Metodologia-sperimentale
+
+diff --git a/src/middle_edge.c b/src/middle_edge.c
+index 3bcdba2..dcf6e65 100644
+--- a/src/middle_edge.c
++++ b/src/middle_edge.c
+@@ -44,14 +44,14 @@ MiddleEdge mid_edge(size_t top, size_t bottom,
+         mid_edge.to_i = mid_vertex_i + 1;
+         mid_edge.to_j = mid_vertex_j + 1;
+         mid_edge.edge = EDGE_DIAGONAL;
+-    } else if(final == next_right) {
+-        mid_edge.to_i = mid_vertex_i;
+-        mid_edge.to_j = mid_vertex_j + 1;
+-        mid_edge.edge = EDGE_HORIZONTAL;
+-    } else {
++    } else if(final == next_down) {
+         mid_edge.to_i = mid_vertex_i + 1;
+         mid_edge.to_j = mid_vertex_j;
+         mid_edge.edge = EDGE_VERTICAL;
++    } else {
++        mid_edge.to_i = mid_vertex_i;
++        mid_edge.to_j = mid_vertex_j + 1;
++        mid_edge.edge = EDGE_HORIZONTAL;
+     }
+ 
+     return mid_edge;
+
+commit de965399d107be08f463a3402417c134489de278
+Author: IacopoGiansanti <iac.giansanti@stud.uniroma3.it>
+Date:   Wed Sep 23 18:11:18 2026 +0200
+
+    added folder for better structure
+
+diff --git a/middle_edge.c b/src/middle_edge.c
+similarity index 100%
+rename from middle_edge.c
+rename to src/middle_edge.c
+
+commit 69194252edfdb7ad7715c34da9ded24e94d8792d
+Author: IacopoGiansanti <iac.giansanti@stud.uniroma3.it>
+Date:   Tue Sep 22 16:42:28 2026 +0200
+
+    Implemented Hirschberg and Needleman-Wunsch algorithm for the Global Alignment Problem
+
+diff --git a/middle_edge.c b/middle_edge.c
+new file mode 100644
+index 0000000..3bcdba2
+--- /dev/null
++++ b/middle_edge.c
+@@ -0,0 +1,58 @@
++#include <stdio.h>
++
++#include "middle_edge.h"
++#include "scoring.h"
++#include "strand.h"
++
++static int max(int a, int b, int c) {
++    if(a >= b) 
++        return a * (a >= c) + c * (a < c);
++    else 
++        return b * (b >= c) + c * (b < c);
++}
++
++
++MiddleEdge mid_edge(size_t top, size_t bottom, 
++                    size_t mid_vertex_i, size_t mid_vertex_j,
++                    const int *suffix, const int* suffix_next,
++                    const Strand *v, const Strand *w, const scoringModel *model) {
++
++    size_t i = mid_vertex_i - top;
++    
++    if(mid_vertex_i == bottom) {
++        MiddleEdge mid_edge = {
++            .from_i = mid_vertex_i,
++            .from_j = mid_vertex_j,
++            .to_i   = mid_vertex_i,
++            .to_j   = mid_vertex_j + 1,
++            .edge   = EDGE_HORIZONTAL
++        };
++        return mid_edge;
++    }     
++
++    int next_down     = suffix[i + 1]      + scoring(v->bases[mid_vertex_i],BASE_GAP,model);
++    int next_right    = suffix_next[i]     + scoring(BASE_GAP,w->bases[mid_vertex_j],model);
++    int next_diagonal = suffix_next[i + 1] + scoring(v->bases[mid_vertex_i],w->bases[mid_vertex_j],model);
++    int final =  max(next_down,next_right,next_diagonal);
++
++    MiddleEdge mid_edge = {
++        .from_i = mid_vertex_i,
++        .from_j = mid_vertex_j,
++    };
++
++    if(final == next_diagonal) {
++        mid_edge.to_i = mid_vertex_i + 1;
++        mid_edge.to_j = mid_vertex_j + 1;
++        mid_edge.edge = EDGE_DIAGONAL;
++    } else if(final == next_right) {
++        mid_edge.to_i = mid_vertex_i;
++        mid_edge.to_j = mid_vertex_j + 1;
++        mid_edge.edge = EDGE_HORIZONTAL;
++    } else {
++        mid_edge.to_i = mid_vertex_i + 1;
++        mid_edge.to_j = mid_vertex_j;
++        mid_edge.edge = EDGE_VERTICAL;
++    }
++
++    return mid_edge;
++}
