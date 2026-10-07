@@ -150,7 +150,7 @@ Una volta determinato il middle vertex rimane da individuare quale arco uscente 
 Dal middle vertex possono partire al più tre archi, corrispondenti alle tre operazioni dell'allineamento.
 
 Sia $R(i,j)$ lo score del miglior cammino dal vertice $(i,j)$ al pozzo.
-Siano $e_{\downarrow},e_{\rightarrow},e_{\searrow}$ sono i tre archi (se esistono) che hanno come coda il vertice $(i,j)$.
+Siano $e_{\downarrow},e_{\rightarrow},e_{\searrow}$ i tre archi (se esistono) che hanno come coda il vertice $(i,j)$.
 Allora, definiamo il costo degli archi appena definiti 
 \[
     \begin{aligned}
@@ -424,6 +424,7 @@ Hirschberg(v,w,top,bottom,left,right,delta)
 
     return concatenate(left_alignment,mid_edge,right_alignment)
 \end{lstlisting}
+\label{lst:hirschberg}
 Tramite un lieve abuso di notazione, nel listing la concatenazione con \texttt{mid\_edge} indica
 l'aggiunta della singola colonna di allineamento determinata da tale arco.
 
@@ -481,10 +482,10 @@ Ne segue che
 D'altra parte, già nella prima chiamata è necessario calcolare gli score relativi a una porzione complessivamente proporzionale all'intero
 alignment graph, richiedendo $\Omega(nm)$ operazioni. Allora
 \[
-    \boxed{T(n,m) = \Theta(nm)}
+    T(n,m) = \Theta(nm)
 \]
 
-Hirschberg conserva dunque la complessità temporale asintotica rispetto a Needleman--Wunsch.
+L'algoritmo di Hirschberg conserva dunque la complessità temporale asintotica rispetto all'algoritmo di Needleman--Wunsch.
 Il vantaggio riguarda l'utilizzo della memoria: la ricostruzione divide et impera richiede di ricalcolare alcuni score,
 introducendo un maggiore fattore costante nel tempo di esecuzione, ma evita di memorizzare l'intera matrice della programmazione dinamica.
 
@@ -720,7 +721,7 @@ in \texttt{v->bases[mid\_vertex\_i]} e \texttt{w->bases[mid\_vertex\_j]}.
 Avendo trovato middle vertex e middle edge siamo pronti per poter ricostruire l'allineamento.
 
 Prima di analizzare la procedura ricorsiva citiamo velocemente i casi base, che sono stati implementati in maniera
-fedele al Listing 6; se una delle due sequenze è vuota, l'unico allineamento possibile consiste nell'allineare
+fedele al Listing~\ref{lst:hirschberg}; se una delle due sequenze è vuota, l'unico allineamento possibile consiste nell'allineare
 tutti i simboli dell'altra sequenza con gap.
 
 Vediamo adesso la ricorrenza che concatena l'allineamento sinistro, il middle edge e l'allineamento destro.

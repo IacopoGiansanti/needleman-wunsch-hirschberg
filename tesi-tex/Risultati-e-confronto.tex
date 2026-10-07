@@ -1,9 +1,285 @@
 \section{Risultati e confronto}
 
-\subsection{Tempo di esecuzione}
+In questo capitolo vengono presentati e discussi i risultati ottenuti mediante il protocollo sperimentale descritto nel Capitolo~\ref{sec:metodologia}.
+L'analisi ha due obiettivi principali: verificare empiricamente la crescita del tempo di esecuzione dei due algoritmi e confrontarne il 
+consumo di memoria. 
 
-\subsection{Consumo di memoria}
+Salvo diversa indicazione, vengono considerate le mediane delle sette esecuzioni valide per ciascuna configurazione.
 
-\subsection{Scalabilità}
+\subsection{Validazione dei risultati}
 
-\subsection{Needleman-Wunsch vs Hirschberg}
+Verifichiamo innanzitutto la correttezza dei risultati degli algoritmi.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Indicatore} & \textbf{Risultato} \\
+        \hline
+        Tentativi complessivi & $406$ \\
+        Esecuzioni completate & $399$ \\
+        Esecuzioni NW non avviate per limite di memoria & 7 \\
+        Coppie NW/Hirschberg confrontabili & $196$ \\
+        Coppie con score coincidente & $196$ \\
+        Allineamenti strutturalmente invalidi & 0 \\
+        \hline
+    \end{tabular}
+    \caption{Validità risultati}
+    \label{tab:verifica_risultati}
+\end{table}
+
+Tutte le esecuzioni completate hanno prodotto un allineamento strutturalmente valido. Per le 196 istanze elaborate da entrambi gli algoritmi,
+Needleman--Wunsch e Hirschberg hanno inoltre restituito lo stesso score ottimo.
+Le esecuzioni non confrontabili sono quelle sui genomi plastidici, queste vengono trattate separatamente e non costituiscono un errore nell'esperimento,
+ma un risultato atteso.
+
+\subsection{Scalabilità su sequenze sintetiche}
+
+Per valutare sperimentalmente la crescita del costo computazionale sono state considerate innanzitutto le istanze sintetiche quadrate, con
+\[
+    n=m \in \{ 250,500,1000,2000,4000,8000,12000 \}.
+\]
+
+Le tre famiglie di input, \texttt{random}, \texttt{identiche}, \texttt{mutate}, presentano lo stesso andamento generale;
+le differenze nel contenuto delle sequenze influenzano i fattori costanti del tempo di esecuzione, ma non modificano la quantità di stati della
+programmazione dinamica che devono essere elaborati.
+
+\paragraph{Tempo di esecuzione.} La Figura~\ref{fig:scalabilita_tempo} riporta, in scala logaritmica, il wall time mediano al crescere della lunghezza delle sequenze.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[
+        width=0.82\textwidth
+    ]{figure/scalabilita_tempo.pdf}
+    \caption{
+        Wall time mediano di Needleman--Wunsch e Hirschberg
+        sulle istanze sintetiche \texttt{random} con $n=m$.
+        Entrambi gli assi sono rappresentati in scala logaritmica.
+    }
+    \label{fig:scalabilita_tempo}
+\end{figure}
+
+Per le sequenze \texttt{random}, Needleman--Wunsch passa da un tempo mediano di circa $6.64\cdot 10^{-4}$s per $n=250$ a $2.374$s per $n=12000$.
+Nello stesso intervallo Hirschberg passa da $1.06\cdot 10^{-3}$s a $2.549$s.
+
+L'aumento osservato è quindi compatibile, per entrambi gli algoritmi, con la crescita quadratica prevista dall'analisi teorica,
+\[
+    T(n,n) = \Theta(n^{2}).
+\]
+
+Una regressione lineare dei valori in scala logaritmica restituisce una pendenza pari circa a $2.13$ per Needleman--Wunsch e $2.01$ per Hirschberg.
+Tali valori sono prossimi all'esponente $2$ previsto dalla complessità $\Theta(n^{2})$.
+
+La stessa tendenza emerge anche per le altre famiglie di input. Per esempio, per $n=12000$ i tempi mediani risultano
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lll}
+        \hline
+        \textbf{Tipo di input} & \textbf{Needleman--Wunsch} & \textbf{Hirschberg} \\
+        \hline
+        \texttt{random} & $2.374$s & $2.549$ \\
+        \texttt{mutate} & $2.127$s & $2.056$ \\
+        \texttt{identiche} & $2.049$s & $2.169$ \\
+        \hline
+    \end{tabular}
+    \caption{Wall time mediano per $n=12000$}
+    \label{tab:tempi}
+\end{table}
+
+Le differenze tra le tre famiglie rimangono quindi contenute rispetto alla crescita determinata dalla dimensione dell'input.
+
+Per le dimensioni più piccole Hirschberg presenta generalmente un overhead maggiore. Nel caso \texttt{random}, per esempio, a $n=1000$ vengono
+misurati $0.0108$s per Needleman--Wunsch e $0.0172$s per Hirschberg.
+All'aumentare della dimensione, tale differenza relativa si riduce: a $n=8000$ i tempi mediani sono rispettivamente $1.063$s e $1.131$s.
+
+Questo comportamento è coerente con il fatto che Hirschberg mantiene la stessa complessità temporale asintotica di Needleman--Wunsch, pur
+introducendo lavoro aggiuntivo per il calcolo degli score necessari alla decomposizione ricorsiva. Tale costo aggiuntivo non determina, negli esperimenti effettuati,
+una separazione sostanziale dei tempi per gli input di dimensione maggiore.
+
+\paragraph{Consumo di memoria.} La differenza più marcata tra le due implementazioni riguarda, ovviamente, il consumo di memoria.
+La Figura~\ref{fig:scalabilita_memoria} riporta il massimo RSS mediano sulle stesse istanze sintetiche.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[
+        width=0.82\textwidth
+    ]{figure/scalabilita_memoria.pdf}
+    \caption{
+        Massimo resident set size mediano di Needleman--Wunsch
+        e Hirschberg sulle istanze sintetiche \texttt{random}
+        con $n=m$. Entrambi gli assi sono rappresentati
+        in scala logaritmica.
+    }
+    \label{fig:scalabilita_memoria}
+\end{figure}
+
+Considerando ancora le istanze \texttt{random}, il massimo resident set size mediano di Needleman--Wunsch cresce come segue:
+\[
+    \begin{array}{c|c}
+        n & \mathrm{RSS}_{NW} \\
+        \hline
+        1000 & 5.75\ \mathrm{MiB}\\
+        2000 & 20.13\ \mathrm{MiB}\\
+        4000 & 77.38\ \mathrm{MiB}\\
+        8000 & 306.38\ \mathrm{MiB}\\
+        12000 & 687.88\ \mathrm{MiB}
+    \end{array}
+\]
+
+Per valori sufficientemente grandi, il raddoppio della lunghezza produce quindi un aumento della memoria vicino a un fattore quattro,
+in accordo con la dipendenza quadratica
+\[
+    S_{\text{NW}}(n,n) = \Theta(n^{2}).
+\]
+
+Considerando le dimensioni $n \geq 1000$, una regressione in scala logaritmica restituisce per Needleman--Wunsch una pendenza di circa $1.93$,
+coerente con la crescita quadratica attesa.
+
+Hirschberg mostra invece un comportamento completamente diverso. Sulle stesse istanze \texttt{random}, il massimo RSS mediano
+passa da circa $1.25$ MiB per $n=250$ a solamente $1.50$ MiB per $n=12000$.
+
+In particolare, osserviamo che per l'istanza $12000  \times 12000$ vengono misurati
+\[ 
+    687.88 \text{MiB}
+\]
+per Needleman--Wunsch, mentre soltanto
+\[
+    1.50 \text{MiB}
+\]
+per Hirschberg, con un rapporto di circa
+\[
+    \frac{687.88}{1.50}\simeq 459.
+\]
+
+Ricordiamo che la misura RSS non coincide tuttavia con lo spazio ausiliario teorico dell'algoritmo, poiché comprende anche
+input, output, runtime e altre strutture del processo, come già discusso nella Sezione~\ref{sec:metodologia}.
+
+Di conseguenza, dai valori costanti osservati per Hirschberg non segue che il suo utilizzo di memoria sia costante. La componente
+teoricamente lineare,
+\[
+    \Theta( \min \{ n,m \}),
+\]
+rimane relativamente piccola rispetto all'overhead di base del processo nell'intervallo di dimensioni considerato e la sua crescita viene
+quindi parzialmente mascherata dalla misura complessiva di RSS.
+
+\paragraph{Istanze rettangolari.} Le istanze rettangolari permettono inoltre di verificare il comportamento quando le lunghezze delle due
+sequenze sono significativamente differenti.
+
+Per la coppia di dimensioni $1000 \times 10000$ e $10000  \times 1000$, Hirschberg utilizza in entrambi i casi un RSS mediano pari a $1.375$ MiB; lo stesso
+valore rimane anche per $2000  \times 20000$ e $20000  \times 2000$.
+
+Questo risultato è coerente con la scelta implementativa di disporre la sequenza più corta lungo la dimensione dei vettori utilizzati
+per il calcolo degli score, in modo che la memoria ausiliaria dipenda da
+\[
+    \min \{ n,m\}.
+\]
+
+Needleman--Wunsch, al contrario, deve memorizzare strutture proporzionali al prodotto $n  \times m$. Il massimo RSS
+risulta infatti $48.75$ MiB per entrambe le orientazioni della coppia $1000  \times 10000$ e $191.88$ MiB per entrambe le
+orientazioni della coppia $2000  \times 20000$.
+
+\subsection{Risultati sulle sequenze biologiche reali}
+
+Gli esperimenti sulle sequenze biologiche reali consentono di osservare lo stesso confronto su input di dimensioni progressivamente
+maggiori. Come specificato nel Capitolo~\ref{sec:metodologia}, tali sequenze vengono utilizzate come carichi di lavoro realistici e gli
+score ottenuti non vengono interpretati dal punto di vista biologico.
+
+I risultati principali sono riportati nelle Tabelle 5.3 e 5.4.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llll}
+        \hline
+        \textbf{Dataset} & \textbf{Dimensioni} & \textbf{Wall time NW} & \textbf{Wall time Hirschberg} \\
+        \hline
+        16S rRNA   & $1514  \times 1445$     & $0.025$s  & $0.034$s \\
+        HIV-1      & $9181  \times 9031$     & $1.194$s  & $1.381$s \\
+        SARS-CoV-2 & $29903  \times 29836$   & $12.233$s & $12.951$s \\
+        Plastidi   & $154478  \times 134525$ & --        & $327.265$s \\
+        \hline
+    \end{tabular}
+    \caption{Wall time sequenze biologiche}
+    \label{tab:tempi_sequenze_bio}
+\end{table}
+
+Notiamo, come ci aspettavamo, che anche sulle sequenze reali i tempi dei due algoritmi rimangono dello stesso ordine di grandezza.
+
+La differenza relativa diminuisce al crescere della dimensione delle sequenze, senza considerare le sequenze per le quali Needleman--Wunsch
+non ha potuto allocare memoria. Per esempio, vediamo come Hirschberg richieda circa il $5.9$\% di tempo in più rispetto a Needleman--Wunsch
+sul dataset SARS-CoV-2.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llll}
+        \hline
+        \textbf{Dataset} & \textbf{Dimensioni} &  \textbf{RSS NW} & \textbf{RSS Hirschberg}\\
+        \hline
+        16S rRNA   & $1514  \times 1445$     &  $11.50$ MiB   & $1.38$ MiB \\
+        HIV-1      & $9181  \times 9031$     &  $396.50$ MiB  & $1.50$ MiB \\
+        SARS-CoV-2 & $29903  \times 29836$   &  $4255.75$ MiB & $1.68$ MiB \\
+        Plastidi   & $154478  \times 134525$ &  --            & $3.52$ MiB \\
+        \hline
+    \end{tabular}
+    \caption{RSS sequenze biologiche}
+    \label{tab:spazio_sequenze_bio}
+\end{table}
+
+La differenza nel consumo di memoria è invece molto più pronunciata. Per HIV-1 vengono misurati $396.50$ MiB per
+Needleman--Wunsch contro $1.50$ MiB per Hirschberg, con un rapporto superiore a $264$.
+
+Nel caso SARS-CoV-2, invece si raggiunge un rapporto di
+\[
+    \frac{4255.75}{1.684}\simeq 2528.
+\]
+
+Pertanto, su questa istanza, una differenza temporale inferiore al $6$\% è accompagnata da una riduzione del massimo RSS superiore a tre ordini di grandezza.
+
+\paragraph{Il caso dei genomi plastidici.} La coppia di genomi plastidici costituisce l'istanza di dimensione maggiore, con
+\[
+    n=154478,\qquad m = 134525.
+\]
+Hirschberg completa tutte le sette esecuzioni con un wall time mediano di
+\[
+    327.265 \text{ s}
+\]
+e un massimo RSS mediano di
+\[
+    3.52 \text{ MiB}.
+\]
+
+Per Needleman--Wunsch, invece, la dimensione delle matrici previste dall'implementazione porta a una stima della memoria richiesta
+di circa $96.8$ GiB, largamente superiore alle risorse rese disponibili all'ambiente WSL utilizzato per gli esperimenti, Tabella~\ref{tab:ambiente}.
+
+Il caso plastidico mostra quindi la conseguenza pratica della diversa complessità spaziale: la riduzione della memoria non costituisce soltanto
+un miglioramento quantitativo, ma permette a Hirschberg di affrontare, sul medesimo ambiente hardware, istanze per le quali la rappresentazione
+completa utilizzata da Needleman--Wunsch richiederebbe una quantità di memoria non disponibile.
+
+\subsection{Conclusioni, Needleman--Wunsch vs Hirschberg}
+
+I risultati sperimentali risultano complessivamente coerenti con l'analisi teorica sviluppata nei capitoli precedenti.
+
+Per quanto riguarda il tempo di esecuzione, sia Needleman--Wunsch che Hirschberg mostrano sulle istanze sintetiche una crescita compatibile con
+\[
+    \Theta(nm),
+\]
+
+Hirschberg introduce un costo aggiuntivo dovuto al ricalcolo degli score necessario alla decomposizione divide et impera, ma tale overhead
+risulta contenuto negli esperimenti effettuati e tende a diventare relativamente meno rilevante per le istanze di dimensione maggiore.
+
+La differenza principale emerge invece nell'utilizzo della memoria. Needleman--Wunsch mantiene esplicitamente le matrici necessarie al calcolo
+e alla ricostruzione dell'allineamento e presenta quindi una crescita coerente con
+\[
+    \Theta(nm).
+\]
+
+Hirschberg evita la memorizzazione dell'intera matrice e utilizza strutture di programmazione dinamica di dimensione lineare nella sequenza più corta.
+Nei test sintetici ciò porta, per $n=12000$, da circa $688$ MiB a $1.5$ MiB di massimo RSS; sul dataset SARS-CoV-2 si passa da circa $4.16$ GiB a $1.68$ MiB.
+
+È stato quindi verificato il vantaggio dell'algoritmo di Hirschberg nella possibilità di mantenere un tempo di esecuzione dello stesso ordine
+di Needleman--Wunsch riducendo drasticamente la memoria necessaria.
+
+Tale differenza diventa particolarmente significativa all'aumentare della dimensione delle sequenze: mentre per input piccoli entrambe le implementazioni
+risultano facilmente utilizzabili, per input più grandi la memoria richiesta dalle matrici di Needleman--Wunsch diventa progressivamente il principale
+limite pratico.
+Hirschberg estende quindi l'insieme delle istanze elaborabili sulle medesime risorse hardware mantenendo la ricostruzione completa di un allineamento ottimo.

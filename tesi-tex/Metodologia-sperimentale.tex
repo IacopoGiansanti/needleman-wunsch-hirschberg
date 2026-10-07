@@ -1,4 +1,5 @@
 \section{Metodologia sperimentale}
+\label{sec:metodologia}
 
 Dopo aver analizzato teoricamente e implementato gli algoritmi di Needleman-Wunsch e Hirschberg, possiamo
 procedere al loro confronto sperimentale.
@@ -7,7 +8,7 @@ L'obiettivo dell'analisi è verificare empiricamente le proprietà discusse nei 
 concentrandoci sul tempo di esecuzione e sul consumo di memoria al crescere della lunghezza
 delle sequenze.
 
-Quando le risorse disponibili lo consentono, entrambi gli algoritmi vengono eseguiti sulla medemisa istanza e con lo stesso modello di scoring.
+Quando le risorse disponibili lo consentono, entrambi gli algoritmi vengono eseguiti sulla medesima istanza e con lo stesso modello di scoring.
 Per input la cui dimensione rende impraticabile l'allocazione delle matrici complete di Needleman--Wunsch, viene eseguito soltanto Hirschberg;
 tali casi vengono indicati esplicitamente nei risultati.
 
@@ -17,17 +18,17 @@ la validità dell'esperimento, che verrà presentato nel capitolo successivo.
 
 \subsection{Dataset}
 
-Per il confronto sperimentale sono state utilizzate due classi di input: sequenze sintetiche generate in modo controllate
+Per il confronto sperimentale sono state utilizzate due classi di input: sequenze sintetiche generate in modo controllato
 e sequenze biologiche reali ottenute dal database NCBI Nucleotide.
 
 Le sequenze sintetiche permettono di controllare direttamente le dimensioni $n$ e $m$ del problema e vengono quindi utilizzate
-principalmente per studiare la scalabilità dei due algoritmi. La generazione degli input viene effettuata mediante un generate
+principalmente per studiare la scalabilità dei due algoritmi. La generazione degli input viene effettuata mediante un generatore
 pseudocasuale deterministico, inizializzato attraverso un seed noto, così da rendere riproducibili le istanze utilizzate.
 Sono state considerate tre famiglie di input sintetici:
 \begin{itemize}
     \item[\texttt{random}] le due sequenze vengono generate indipendentemente sull'alfabeto $\Sigma_{\text{DNA}}=\{ \texttt{A},\texttt{C},\texttt{G},\texttt{T} \}$;
-    \item[\texttt{identical}] la seconda sequenza coincide con la prima;
-    \item[\texttt{mutated}] la seconda sequenza viene ottenuta dalla prima sostituendo ciascun simbolo con probabilità $0.05$. In caso di
+    \item[\texttt{identiche}] la seconda sequenza coincide con la prima;
+    \item[\texttt{mutate}] la seconda sequenza viene ottenuta dalla prima sostituendo ciascun simbolo con probabilità $0.05$. In caso di
         sostituzione viene scelta una delle altre tre basi.
 \end{itemize}
 
@@ -39,7 +40,7 @@ Per ogni combinazione di dimensione e famiglia vengono generate sette istanze in
 Per ciascun seed entrambi gli algoritmi vengono quindi eseguiti esattamente sulla stessa coppia di sequenze. 
 
 Sono inoltre considerate alcune istanze rettangolari, con $n \neq m$, al fine di osservare il comportamento degli algoritmi anche quando le due
-sequenze hanno lunghezze significativamente differente
+sequenze hanno lunghezze significativamente differenti.
 
 Agli input sintetici sono affiancate quattro coppie di sequenze biologiche reali, scelte in modo da coprire dimensioni
 progressivamente maggiori.
@@ -102,7 +103,7 @@ progressivamente maggiori.
 
 Le sequenze sono state scaricate manualmente in formato FASTA da NCBI Nucleotide utilizzando gli accession number indicati.
 
-Nella prima coppia sono presenti anche dei simboli \texttt{N}, che indicano nucleotidi non determinati, questi vengono sostituiti preliminarmente 
+Nella prima coppia sono presenti anche dei simboli \texttt{N}, mentre nella sequenza Delta (B.1.617.2) è presente il simbolo \texttt{Y}, che indicano nucleotidi non determinati, questi vengono sostituiti preliminarmente 
 con simboli scelti pseudocasualmente da $\Sigma_{\text{DNA}}$. Il preprocessing utilizza un seed fissato e viene eseguito una sola
 volta prima della raccolta delle misure, così da garantire che entrambi gli algoritmi operino sulle medesime sequenze e che l'esperimento sia riproducibile.
 Le sequenze reali sono utilizzate come carichi di lavoro realistici di dimensione crescente. Lo score ottenuto non viene pertanto 
@@ -120,13 +121,13 @@ influenzare le prestazioni.
         \hline
         \textbf{Componente} & \textbf{Configurazione} \\
         \hline
-        Processore & Snapdragon(R) X 12-core X1E80100 @ 3.40 GHz (3.42 GHz) \\
+        Processore & Snapdragon(R) X 12-core X1E80100 @ 3.40 GHz \\
         Architettura & ARM64 (AArch64) \\
         Memoria RAM & 16,0 GB \\
         Memoria visibile a WSL 2 & 9.7 GiB \\
         Swap WSL 2 & 4.0 GiB \\
         Sistema operativo host & Microsoft Windows 11 \\
-        Ambiente di esecuzione & WSL 2 (2.6.1.0) -- Ubuntu 24.04.5 LTS, Linux ARM64 \\
+        Ambiente di esecuzione & WSL 2 (2.6.1.0) -- Ubuntu 24.04.5 LTS \\
         Compilatore & GCC \\
         Versione compilatore & 13.3.0 \\
         Flag di compilazione & \texttt{-O2 -Wall -Wextra -Wpedantic -std=c99} \\
@@ -136,10 +137,11 @@ influenzare le prestazioni.
     \label{tab:ambiente}
 \end{table}
 
-Sebbene il sistema host disponga di 16 GB di memoria fisica, l'ambiente WSL 2 utilizzato per gli esperimenti disponde di circa 9.7 GiB di memoria RAM,
+Sebbene il sistema host disponga di 16 GB di memoria fisica, l'ambiente WSL 2 utilizzato per gli esperimenti dispone di circa 9.7 GiB di memoria RAM,
 oltre a 4.0 GiB di spazio di swap. Tali valori costituiscono quindi il riferimento effettivo per la valutazione della fattibilità delle esecuzioni.
 
 \subsection{Misura dei tempi e della memoria}
+\label{sec:misura}
 
 Ogni esecuzione del benchmark avviene in un processo separato.
 La misura temporale comprende esclusivamente l'esecuzione dell'algoritmo di allineamento. La generazione di input sintetici, la lettura
@@ -149,7 +151,7 @@ Vengono raccolte due misure temporali. Il tempo reale trascorso, o \emph{wall ti
 mentre il tempo di CPU viene ottenuto mediante \texttt{CLOCK\_PROCESS\_CPUTIME\_ID}. Il wall time viene utilizzato come misura principale delle prestazioni
 temporali, mentre il CPU time costituisce una misura complementare.
 
-Per gli input sintetici, l'ordine delle esecuzioni di Needleman--Wunsch e Hirschberg viene alternate tra istanze successive, così da evitare
+Per gli input sintetici, l'ordine delle esecuzioni di Needleman--Wunsch e Hirschberg viene alternato tra istanze successive, così da evitare
 di favorire sistematicamente uno dei due algoritmi a causa dell'ordine di esecuzione.
 
 Per le sequenze biologiche reali la coppia di input rimane invece invariata tra le diverse esecuzioni. Anche in questo caso viene alternato
@@ -164,7 +166,7 @@ la diversa crescita della memoria richiesta dalle due implementazioni eseguite n
 Al termine viene verificata la validità strutturale dell'allineamento prodotto. Eliminando i gap dalle due sequenze allineate
 devono essere ricostruiti esattamente gli input originali; inoltre lo score dell'allineamento viene ricalcolato e confrontato con quello
 restituito dall'algoritmo.
-Quando una stessa istanza viene elaborata da entrambi gli algoritmi, viene elaborata da entrambi gli algoritmi, viene verificato inoltre
+Quando una stessa istanza viene elaborata da entrambi gli algoritmi, viene verificato inoltre
 che Needleman--Wunsch e Hirschberg restituiscano lo stesso score ottimo.
 
 Le esecuzioni terminate correttamente vengono aggregate per configurazione. Per wall time, CPU time e memoria vengono calcolate la mediana,
