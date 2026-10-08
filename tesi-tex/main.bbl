@@ -20,6 +20,11 @@ Neil~C. Jones and Pavel~A. Pevzner.
 \newblock {\em An Introduction to Bioinformatics Algorithms}.
 \newblock The MIT Press, Cambridge, Massachusetts, 2004.
 
+\bibitem[{Nat}]{ncbi}
+{National Center of Biotechnology Information}.
+\newblock {NCBI Nucleotide}.
+\newblock \url{https://www.ncbi.nlm.nih.gov/nucleotide}.
+
 \bibitem[NW70]{needleman--wunsch}
 Saul~B. Needleman and Christian~D. Wunsch.
 \newblock A general method applicable to the search for similarities in the amino acid sequence of two proteins.

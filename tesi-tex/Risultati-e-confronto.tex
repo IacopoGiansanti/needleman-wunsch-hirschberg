@@ -16,7 +16,7 @@ Verifichiamo innanzitutto la correttezza dei risultati degli algoritmi.
         \hline
         \textbf{Indicatore} & \textbf{Risultato} \\
         \hline
-        Tentativi complessivi & $406$ \\
+        Run complessive & $406$ \\
         Esecuzioni completate & $399$ \\
         Esecuzioni NW non avviate per limite di memoria & 7 \\
         Coppie NW/Hirschberg confrontabili & $196$ \\
@@ -78,9 +78,9 @@ La stessa tendenza emerge anche per le altre famiglie di input. Per esempio, per
         \hline
         \textbf{Tipo di input} & \textbf{Needleman--Wunsch} & \textbf{Hirschberg} \\
         \hline
-        \texttt{random} & $2.374$s & $2.549$ \\
-        \texttt{mutate} & $2.127$s & $2.056$ \\
-        \texttt{identiche} & $2.049$s & $2.169$ \\
+        \texttt{random} & $2.374$s & $2.549$s \\
+        \texttt{mutate} & $2.127$s & $2.056$s \\
+        \texttt{identiche} & $2.049$s & $2.169$s \\
         \hline
     \end{tabular}
     \caption{Wall time mediano per $n=12000$}
@@ -175,7 +175,7 @@ per il calcolo degli score, in modo che la memoria ausiliaria dipenda da
     \min \{ n,m\}.
 \]
 
-Needleman--Wunsch, al contrario, deve memorizzare strutture proporzionali al prodotto $n  \times m$. Il massimo RSS
+Needleman--Wunsch, al contrario, deve memorizzare strutture di taglia proporzionale al prodotto $n  \times m$. Il massimo RSS
 risulta infatti $48.75$ MiB per entrambe le orientazioni della coppia $1000  \times 10000$ e $191.88$ MiB per entrambe le
 orientazioni della coppia $2000  \times 20000$.
 

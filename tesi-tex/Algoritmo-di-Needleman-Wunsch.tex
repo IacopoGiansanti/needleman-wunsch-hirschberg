@@ -156,6 +156,7 @@ ricostruendo
 
 Possiamo adesso fornire lo pseudocodice per l'algoritmo di Needleman--Wunsch.
 
+\begin{codeblock}
 \begin{lstlisting}[style=pseudo,caption={Global Alignment}]
 NeedlemanWunsch(v,w,delta)
     n <- |v| 
@@ -184,10 +185,12 @@ NeedlemanWunsch(v,w,delta)
 
     return (S[n,m] , alignment)
 \end{lstlisting}
+\end{codeblock}
 
 Adottiamo una politica deterministica di tie-breaking che assegna priorità, nell'ordine, allo spostamento diagonale, verticale e orizzontale.
 Il seguente è un possibile pseudocodice del traceback.
 
+\begin{codeblock}
 \begin{lstlisting}[style=pseudo,caption={Ricostruzione dell'allineamento tramite traceback}]
 Backtrack(B,v,w,i,j)
     alignedV <- empty
@@ -215,6 +218,7 @@ Backtrack(B,v,w,i,j)
 
     return (alignedV,alignedW)
 \end{lstlisting}
+\end{codeblock}
 
 Quindi, la prima procedura costruisce la matrice degli score e quella dei predecessori; la seconda utilizza quest'ultima per ricostruire
 un allineamento ottimo a partire dalla cella $(n,m)$.
@@ -352,6 +356,7 @@ una maschera di bit. In questo modo una singola cella può memorizzare contempor
 Dopo l'inizializzazione della prima riga e della prima colonna delle matrici, gli stati interni vengono calcolati secondo la ricorrenza descritta nella
 Sezione~\ref{sec:NW-1}. Il seguente frammento mostra il riempimento delle matrici \texttt{score} e \texttt{pred}.
 
+\begin{codeblock}
 \begin{lstlisting}[language=C]
 for(size_t i=1; i<=n; i++) {
     for(size_t j=1; j<=m; j++) {
@@ -367,6 +372,7 @@ for(size_t i=1; i<=n; i++) {
     }
 }
 \end{lstlisting}
+\end{codeblock}
 
 A differenza dello pseudocodice della Sezione~\ref{sec:NW-pseudocodice}, la scelta del predecessore non viene effettuata durante il riempimento della matrice.
 In caso di parità, tutte le direzioni che realizzano il massimo vengono memorizzate in \texttt{pred[i][j]} mediante una bitmask.

@@ -272,6 +272,7 @@ con \texttt{previous} e \texttt{current}.
 Nello pseudocodice seguente gli indici dei vettori coincidono, per semplicità, con gli
 indici delle righe dell'alignment graph.
 
+\begin{codeblock}
 \begin{lstlisting}[style=pseudo,caption={Calcolo degli score in spazio lineare}]
 NWScore(v,w,top,bottom,left,right,delta)
     previous[top] <- 0
@@ -292,6 +293,7 @@ NWScore(v,w,top,bottom,left,right,delta)
 
     return previous
 \end{lstlisting}
+\end{codeblock}
 Al termine della procedura,
 \[
     \texttt{previous}[i]
@@ -315,6 +317,7 @@ In questo caso
 rappresenta lo score del cammino ottimo dal vertice $(i,\texttt{left})$ al pozzo del sottoproblema $(\texttt{bottom},\texttt{right})$,
 per ogni $i \in \{ \texttt{top},\ldots,\texttt{bottom} \}$.
 
+\begin{codeblock}
 \begin{lstlisting}[style=pseudo,caption={Calcolo inverso degli score}]
 NWScoreReverse(v,w,top,bottom,left,right,delta)
     previous[bottom] <- 0
@@ -335,6 +338,7 @@ NWScoreReverse(v,w,top,bottom,left,right,delta)
 
     return previous
 \end{lstlisting}
+\end{codeblock}
 
 \paragraph{Determinazione del middle edge.}
 
@@ -343,6 +347,7 @@ Una volta individuato il middle vertex $(i,j)$, rimane da scegliere l'arco ottim
 Per effettuare il confronto sono necessari gli score a partire dalla colonna $j$ e dalla colonna $j+1$.
 Indichiamo con \texttt{suffix} e \texttt{suffix\_next} i due vettori corrispondenti.
 
+\begin{codeblock}
 \begin{lstlisting}[style=pseudo,caption={Determinazione del middle edge}]
 MiddleEdge(v,w,bottom,mid_vertex,suffix,suffix_next,delta)
     i <- mid_vertex.i
@@ -365,6 +370,7 @@ MiddleEdge(v,w,bottom,mid_vertex,suffix,suffix_next,delta)
     else
         return (i,j)->(i,j+1)
 \end{lstlisting}
+\end{codeblock}
 In caso di parità tra più valori candidati, è sufficiente scegliere uno qualunque degli
 archi che realizzano il massimo. Nel seguito adottiamo, per determinismo, la priorità
 diagonale, verticale, orizzontale.
@@ -641,6 +647,7 @@ int *suffix = nw_score_reverse(v,v_source,v_sink,w,mid_j, w_sink,model);
 \end{lstlisting}
 
 Il seguente frammento mostra come viene ricercato l'elemento massimo di $\operatorname{prefix}(i)+\operatorname{suffix}(i)$
+\begin{codeblock}
 \begin{lstlisting}[language=C]
 size_t mid_offset = 0;
 int max = prefix[0] + suffix[0];
@@ -654,6 +661,7 @@ for(size_t i=1; i<=n; i++) {
 }
 size_t mid_i = v_source + mid_offset;
 \end{lstlisting}
+\end{codeblock}
 Poiché i vettori sono indicizzati relativamente al sottoproblema, \texttt{mid\_offset} identifica la riga del middle vertex rispetto
 a \texttt{v\_source}.
 
@@ -664,6 +672,7 @@ Il middle edge viene rappresentato da una struttura \texttt{MiddleEdge}, che mem
 iniziale, il vertice finale e la direzione dell'arco.
 
 Di seguito è presente la funzione \texttt{mid\_edge} che restituisce il middle edge di un sottoproblema.
+\begin{codeblock}
 \begin{lstlisting}[language=C]
 MiddleEdge mid_edge(size_t top, size_t bottom, 
                     size_t mid_vertex_i, size_t mid_vertex_j,
@@ -683,8 +692,8 @@ MiddleEdge mid_edge(size_t top, size_t bottom,
         return mid_edge;
     }     
 
-    int next_down     = suffix[i + 1]      + scoring(v->bases[mid_vertex_i],BASE_GAP,model);
-    int next_right    = suffix_next[i]     + scoring(BASE_GAP,w->bases[mid_vertex_j],model);
+    int next_down = suffix[i + 1] + scoring(v->bases[mid_vertex_i],BASE_GAP,model);
+    int next_right = suffix_next[i] + scoring(BASE_GAP,w->bases[mid_vertex_j],model);
     int next_diagonal = suffix_next[i + 1] + scoring(v->bases[mid_vertex_i],w->bases[mid_vertex_j],model);
     int final =  max(next_down,next_right,next_diagonal);
 
@@ -710,6 +719,7 @@ MiddleEdge mid_edge(size_t top, size_t bottom,
     return mid_edge;
 }
 \end{lstlisting}
+\end{codeblock}
 
 Nella formulazione teorica l'arco uscente dal vertice $(i,j)$ utilizza $v_{i+1}$ e $w_{j+1}$.
 Gli array C sono indicizzati a partire da zero; dunque, se \texttt{mid\_vertex\_i} e \texttt{mid\_vertex\_j}

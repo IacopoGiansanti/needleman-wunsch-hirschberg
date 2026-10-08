@@ -19,27 +19,34 @@ la validità dell'esperimento, che verrà presentato nel capitolo successivo.
 \subsection{Dataset}
 
 Per il confronto sperimentale sono state utilizzate due classi di input: sequenze sintetiche generate in modo controllato
-e sequenze biologiche reali ottenute dal database NCBI Nucleotide.
+e sequenze biologiche reali ottenute dal database NCBI Nucleotide \cite{ncbi}.
 
 Le sequenze sintetiche permettono di controllare direttamente le dimensioni $n$ e $m$ del problema e vengono quindi utilizzate
 principalmente per studiare la scalabilità dei due algoritmi. La generazione degli input viene effettuata mediante un generatore
 pseudocasuale deterministico, inizializzato attraverso un seed noto, così da rendere riproducibili le istanze utilizzate.
 Sono state considerate tre famiglie di input sintetici:
-\begin{itemize}
-    \item[\texttt{random}] le due sequenze vengono generate indipendentemente sull'alfabeto $\Sigma_{\text{DNA}}=\{ \texttt{A},\texttt{C},\texttt{G},\texttt{T} \}$;
-    \item[\texttt{identiche}] la seconda sequenza coincide con la prima;
-    \item[\texttt{mutate}] la seconda sequenza viene ottenuta dalla prima sostituendo ciascun simbolo con probabilità $0.05$. In caso di
-        sostituzione viene scelta una delle altre tre basi.
-\end{itemize}
 
-Sono state considerate sequenze di lunghezza crescente per generare input quadrati
+\begin{description}[
+    style=multiline,
+    labelwidth=2cm,
+    leftmargin=2.5cm,
+    font=\ttfamily
+]
+    \item[random] le due sequenze vengono generate indipendentemente sull'alfabeto $\Sigma_{\text{DNA}}=\{\texttt{A},\texttt{C},\texttt{G},\texttt{T}\}$;
+
+    \item[identiche] la seconda sequenza coincide con la prima;
+
+    \item[mutate] la seconda sequenza viene ottenuta dalla prima sostituendo ciascun simbolo con probabilità $0.05$. In caso di sostituzione viene scelta una delle altre tre basi.
+\end{description}
+
+Sono state considerate sequenze di lunghezza crescente per generare input quadrati $(n=m)$ di lunghezza
 \[
     250,\;500,\;1000,\;2000,\;4000,\;8000,\;12000.
 \]
 Per ogni combinazione di dimensione e famiglia vengono generate sette istanze indipendenti per configurazione, ottenute mediante seed differenti.
 Per ciascun seed entrambi gli algoritmi vengono quindi eseguiti esattamente sulla stessa coppia di sequenze. 
 
-Sono inoltre considerate alcune istanze rettangolari, con $n \neq m$, al fine di osservare il comportamento degli algoritmi anche quando le due
+Sono inoltre considerate alcune istanze "rettangolari", con $n \neq m$, al fine di osservare il comportamento degli algoritmi anche quando le due
 sequenze hanno lunghezze significativamente differenti.
 
 Agli input sintetici sono affiancate quattro coppie di sequenze biologiche reali, scelte in modo da coprire dimensioni

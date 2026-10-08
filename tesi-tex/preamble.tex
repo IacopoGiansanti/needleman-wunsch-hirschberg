@@ -25,6 +25,25 @@
 % FIGURE
 \usepackage{placeins}
 
+\newenvironment{codeblock}
+{%
+    \par\medskip
+    \noindent
+    \begin{minipage}{\linewidth}%
+    \lstset{
+        xleftmargin=0pt,
+        xrightmargin=0pt,
+        breaklines=true,
+        breakatwhitespace=false,
+        breakindent=0pt,
+        columns=fullflexible
+    }%
+}
+{%
+    \end{minipage}%
+    \par\medskip
+}
+
 % IMPAGINAZIONE
 % Conserva il blocco verticale del modello; rende effettive e coerenti
 % le misure di memoir, inclusi i margini laterali impostati dalla classe.
