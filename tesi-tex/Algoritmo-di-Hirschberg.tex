@@ -52,6 +52,8 @@ La loro area complessiva risulta pertanto leggermente inferiore rispetto alla de
 Tale vantaggio riguarda tuttavia soltanto i fattori costanti: entrambe le formulazioni mantengono tempo $\Theta(nm)$ e spazio lineare.
 Non ne segue quindi, in generale, una maggiore efficienza pratica, che dipende dal costo necessario per individuare il middle edge.
 
+% Avvia la definizione insieme alla sua prima ricorrenza.
+\Needspace{14\baselineskip}
 \subsection{Ricorrenza, Middle vertex e Middle edge}
 
 La ricorrenza utilizzata nell'algoritmo di Hirschberg è la stessa introdotta per Needleman--Wunsch.
@@ -189,8 +191,8 @@ progressivamente durante la ricorsione.
     \label{fig:linear-space-alignment}
 \end{figure}
 
-\FloatBarrier
-
+% Completa la figura prima di iniziare la spiegazione dell’esempio.
+\clearpage
 Analizziamo un esempio per verificare ciò che abbiamo appena detto.
 Consideriamo le solite sequenze $v:=\texttt{ACCT}$ e $w:=\texttt{ACT}$.
 La colonna centrale è:
@@ -269,6 +271,7 @@ Come osservato precedentemente, per calcolare una colonna sono sufficienti la co
 precedente e i valori già determinati dalla colonna corrente. Indichiamo tali vettori rispettivamente 
 con \texttt{previous} e \texttt{current}.
 
+\Needspace{24\baselineskip}
 Nello pseudocodice seguente gli indici dei vettori coincidono, per semplicità, con gli
 indici delle righe dell'alignment graph.
 
@@ -340,6 +343,8 @@ NWScoreReverse(v,w,top,bottom,left,right,delta)
 \end{lstlisting}
 \end{codeblock}
 
+% Evita un titolo che rimanda il relativo algoritmo alla pagina dopo.
+\Needspace{19\baselineskip}
 \paragraph{Determinazione del middle edge.}
 
 Una volta individuato il middle vertex $(i,j)$, rimane da scegliere l'arco ottimo uscente da esso.
@@ -386,6 +391,7 @@ sia
 Entrambi possono essere ottenuti mediante \texttt{NWScoreReverse}, applicata rispettivamente alla colonna
 e a quella immediatamente successiva.
 
+\Needspace{12\baselineskip}
 \paragraph{Procedura ricorsiva.}
 
 Possiamo infine combinare le procedure precedenti.
@@ -587,7 +593,8 @@ Quindi alloca due vettori di $n+1$ interi, con $n = \texttt{v\_sink} - \texttt{v
 Di seguito viene mostrato il frammento di codice che comprende l'inizializzazione dei due vettori
 e il calcolo degli score dell'ultima colonna del sottoproblema corrente.
 
-\begin{lstlisting}[language=C]
+\begin{codeblock}
+\begin{lstlisting}[language=C,basicstyle=\ttfamily\footnotesize]
 previous[0] = 0;
 for(size_t i=1; i<=n; i++) {
     previous[i] = previous[i-1] + scoring(v->bases[v_source + i - 1],BASE_GAP,model);
@@ -597,9 +604,13 @@ current[0] = 0;
 for(size_t j=1; j<=m; j++) {
     current[0] = previous[0] + scoring(BASE_GAP,w->bases[w_source + j - 1],model);
     for(size_t i=1; i<=n; i++) {
-        int up       = current[i-1] + scoring(v->bases[v_source + i - 1],BASE_GAP,model);
-        int left     = previous[i] + scoring(BASE_GAP,w->bases[w_source + j - 1],model);
-        int diagonal = previous[i-1] + scoring(v->bases[v_source + i - 1],w->bases[w_source + j - 1],model);
+        int up       = current[i-1]
+            + scoring(v->bases[v_source + i - 1],BASE_GAP,model);
+        int left     = previous[i]
+            + scoring(BASE_GAP,w->bases[w_source + j - 1],model);
+        int diagonal = previous[i-1]
+            + scoring(v->bases[v_source + i - 1],
+                      w->bases[w_source + j - 1],model);
         current[i] = max(up,left,diagonal);
     }
     int *temp = previous;
@@ -607,6 +618,7 @@ for(size_t j=1; j<=m; j++) {
     current   = temp;
 }
 \end{lstlisting}
+\end{codeblock}
 
 Gli indici \texttt{i} e \texttt{j} utilizzati all'interno della funzione sono relativi al sottoproblema corrente.
 Per accedere alla sequenza originale vengono quindi sommati gli offset \texttt{v\_source} e \texttt{w\_source}.
@@ -646,6 +658,7 @@ int *prefix = nw_score(v,v_source,v_sink,w,w_source,mid_j,model);
 int *suffix = nw_score_reverse(v,v_source,v_sink,w,mid_j, w_sink,model);
 \end{lstlisting}
 
+\Needspace{13\baselineskip}
 Il seguente frammento mostra come viene ricercato l'elemento massimo di $\operatorname{prefix}(i)+\operatorname{suffix}(i)$
 \begin{codeblock}
 \begin{lstlisting}[language=C]

@@ -26,7 +26,7 @@
 \NeedsTeXFormat{LaTeX2e}[1995/12/01]
 \ProvidesPackage{TesiDiaUniroma3}[2023/11/06 v2.0 Tesi - DIA-Uniroma3]
 
-\LoadClass[a4paper,11pt,oneside,italian]{memoir}
+\LoadClass[a4paper,11pt,oneside,openany,italian]{memoir}
 
 % Si utilizza la sillabazione italiana
 \RequirePackage[italian]{babel}
@@ -38,8 +38,8 @@
 % pacchetti per i font
 \usepackage[T1]{fontenc}
 % interlinea
-\linespread{1.4}
-% margini (la dimensione del blocco di testo viene regolata di conseguenza)
+\linespread{1.34}
+% margini fissi su ogni pagina: sinistra 3,5 cm (rilegatura), destra 3 cm
 \setlrmarginsandblock{3.5cm}{3cm}{*}
 % profondità dell'indice (settato per stampare fino alle sottosezioni)
 \setcounter{tocdepth}{2}
@@ -145,6 +145,7 @@
 \newcommand{\generaIndice}{
 	%\fancyhead[L]{\textbf{\rightmark}}
 	\newpage
+	\markboth{Indice}{Indice}
 	\tableofcontents
 	\clearpage
 	%\fancyhead[L]{\textbf{\leftmark}}

@@ -1,0 +1,11 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Suddivisione ricorsiva dello spazio di allineamento nell'algoritmo in spazio lineare. Tratto da Jones e Pevzner~\cite [p.~235]{jones--pevzner}. }}{28}{figure.3.1}%
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Wall time mediano di Needleman--Wunsch e Hirschberg sulle istanze sintetiche \texttt {random} con $n=m$. Entrambi gli assi sono rappresentati in scala logaritmica. }}{49}{figure.5.1}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Massimo resident set size mediano di Needleman--Wunsch e Hirschberg sulle istanze sintetiche \texttt {random} con $n=m$. Entrambi gli assi sono rappresentati in scala logaritmica. }}{51}{figure.5.2}%

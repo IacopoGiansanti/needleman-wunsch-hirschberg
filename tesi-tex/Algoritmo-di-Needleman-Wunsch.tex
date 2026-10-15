@@ -11,7 +11,8 @@ Quindi, come visto nel precedente capitolo, possiamo affermare che $S_{i,j}$ coi
 
 Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilità:
 \begin{itemize}
-    \item \textbf{Delezione}
+    \Needspace{9\baselineskip}
+    \item \textbf{Cancellazione}
 
         L'ultima colonna è
         \[
@@ -24,7 +25,8 @@ Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilit�
         \[
             S_{i-1,j} + \delta(v_{i},-)
         \]
-    \item \textbf{Inserzione}
+    \Needspace{9\baselineskip}
+    \item \textbf{Inserimento}
 
         L'ultima colonna è
         \[
@@ -37,6 +39,7 @@ Consideriamo l'ultima colonna di un allineamento ottimo, abbiamo tre possibilit�
         \[
             S_{i,j-1} + \delta(-,w_{j})
         \]
+    \Needspace{9\baselineskip}
     \item \textbf{Match o mismatch}
 
         L'ultima colonna è
@@ -118,6 +121,7 @@ In caso di parità tra più direzioni esistono più cammini equivalenti, e quind
 Se l'obiettivo è ricostruire un singolo allineamento ottimo, è sufficiente adottare una regola deterministica di tie-breaking;
 per rappresentare tutti gli allineamenti ottimi sarebbe invece necessario conservare tutti i predecessori che realizzano il massimo.
 
+\Needspace{12\baselineskip}
 Mostriamo un esempio.
 Siano $v:=\texttt{ACCT}$ e $w:=\texttt{ACT}$ due sequenze.
 Sia $\delta(a,b)$ la funzione di scoring definita in modo tale che restituisca $1$ in caso di match e $-1$ altrimenti.
@@ -151,6 +155,8 @@ ricostruendo
 \]
 
 
+% Mantieni assieme intestazione, introduzione e primo algoritmo.
+\Needspace{25\baselineskip}
 \subsection{Pseudocodice}
 \label{sec:NW-pseudocodice}
 
@@ -223,6 +229,8 @@ Backtrack(B,v,w,i,j)
 Quindi, la prima procedura costruisce la matrice degli score e quella dei predecessori; la seconda utilizza quest'ultima per ricostruire
 un allineamento ottimo a partire dalla cella $(n,m)$.
 
+% La formula iniziale e la spiegazione devono comparire assieme.
+\Needspace{16\baselineskip}
 \subsection{Analisi della complessità}
 \label{sec:NW-complessità}
 
@@ -350,6 +358,8 @@ bidimensionale \texttt{score[i][j]}, limitando l'overhead dovuto a molteplici al
 La matrice \texttt{pred} utilizza il tipo \texttt{Direction}; le possibili direzioni sono rappresentate mediante flag distinti e combinate attraverso
 una maschera di bit. In questo modo una singola cella può memorizzare contemporaneamente più predecessori ottimi.
 
+% Evita il titolo e la descrizione su una pagina diversa dal codice.
+\Needspace{16\baselineskip}
 \subsubsection{Algoritmo}
 \label{sec:NW-implementazione-algoritmo}
 
@@ -396,6 +406,7 @@ La funzione \texttt{needleman\_wunsch} restituisce un oggetto di tipo \texttt{Al
 \]
 
 Le matrici \texttt{score} e \texttt{pred} costituiscono strutture ausiliarie necessarie soltanto durante l'esecuzione dell'algoritmo.
+\Needspace{7\baselineskip}
 Dopo il traceback, una volta trasferiti nella struttura \texttt{Alignment} lo score finale e le sequenze allineate, la memoria associata alle due matrici può essere liberata.
 \[
     \begin{aligned}

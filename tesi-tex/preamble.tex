@@ -1,7 +1,7 @@
 % Modello Patrignani, versione della classe 2023/11/06.
 % FAQ: https://patrignani.inf.uniroma3.it/tesi-faq.html
-% La classe originale imposta memoir, A4, 11 pt, oneside, italiano,
-% \linespread{1.4}, margini sinistro 3.5 cm e destro 3 cm.
+% Versione stampa SOLO FRONTE: memoir, A4, 11 pt, oneside, openany,
+% \linespread{1.34}, margini sinistro 3.5 cm (rilegatura) e destro 3 cm.
 % Non sovrapporre geometry, tocloft o un'altra classe report/article:
 % memoir gestisce direttamente impaginazione e indice.
 
@@ -10,6 +10,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{microtype}
+\usepackage{needspace} % impedisce titoli e introduzioni isolati in fondo pagina
 
 % MATEMATICA: conserva i pacchetti e i comandi dei tuoi capitoli.
 \usepackage{amsmath,amssymb,mathtools}
@@ -46,7 +47,7 @@
 
 % IMPAGINAZIONE
 % Conserva il blocco verticale del modello; rende effettive e coerenti
-% le misure di memoir, inclusi i margini laterali impostati dalla classe.
+% le misure di memoir, con margini uguali su tutte le pagine.
 \setlength{\headheight}{32pt}
 \checkandfixthelayout
 \raggedbottom
@@ -91,12 +92,20 @@
 }
 \AtBeginEnvironment{lstlisting}{\SingleSpacing}
 
-% INTESTAZIONI: come nel modello, capitolo a sinistra e pagina a destra.
-% Il contenitore evita il problema noto della classe con titoli lunghi.
+% INTESTAZIONI solo fronte: stessa disposizione su tutte le pagine.
+% Nome del capitolo a sinistra; numero di pagina SEMPRE in alto a destra.
+% La parbox evita sbordature in intestazioni con titoli lunghi.
 \fancyhf{}
 \setlength{\headwidth}{\textwidth}
 \fancyhead[L]{\parbox[b]{0.88\textwidth}{\small\bfseries\nouppercase{\leftmark}}}
 \fancyhead[R]{\textbf{\thepage}}
+% Sulle pagine di apertura capitolo non ripetiamo il titolo, ma il numero resta in alto a destra.
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \fancyhead[R]{\textbf{\thepage}}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+\aliaspagestyle{chapter}{plain}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
 \makeatletter

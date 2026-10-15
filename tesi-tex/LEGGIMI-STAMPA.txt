@@ -1,0 +1,29 @@
+VERSIONE PER STAMPA SOLO FRONTE — 14/10/2026
+
+PDF finale: main.pdf
+
+ULTIMA CORREZIONE
+- Il frammento C della sezione 3.4.1 di Hirschberg (p. 38) ora rimane interamente
+  sulla stessa pagina: font locale leggermente ridotto e ritorni a capo leggibili.
+- Il codice C mantiene esattamente gli stessi token, senza cambi di istruzioni.
+
+CONTENUTO
+- Stesso testo della precedente versione fronte-retro con impaginazione pulita.
+- Mantiene Cancellazione e Inserimento nella sezione 2.1.
+- Mantiene dedica, frontespizio, figure, formule, algoritmi e bibliografia.
+
+IMPAGINAZIONE
+- Carta A4, 11 pt, margine sinistro 3,5 cm (rilegatura) e destro 3 cm.
+- Modalita' memoir oneside/openany: ogni pagina e' stampata solo sul fronte.
+- Interlinea 1,34 e correzioni di impaginazione basate su needspace.
+- Intestazione uniforme: titolo del capitolo a sinistra, numero in alto a destra.
+- Nessuna pagina bianca inserita per forzare capitoli su pagina dispari.
+
+STAMPA
+- Stampa A4 solo fronte, dimensioni effettive (100%).
+- Una pagina PDF per foglio, rilegatura a sinistra.
+- Nessuna modalita' opuscolo, nessuna stampa fronte-retro.
+
+COMPILAZIONE
+- pdflatex main.tex; bibtex main; pdflatex main.tex; pdflatex main.tex.
+- Dopo modifiche al testo ricontrollare i salti di pagina.

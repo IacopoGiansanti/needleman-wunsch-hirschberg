@@ -1,0 +1,181 @@
+\section{Metodologia sperimentale}
+\label{sec:metodologia}
+
+Dopo aver analizzato teoricamente e implementato gli algoritmi di Needleman-Wunsch e Hirschberg, possiamo
+procedere al loro confronto sperimentale.
+
+L'obiettivo dell'analisi è verificare empiricamente le proprietà discusse nei capitoli precedenti,
+concentrandoci sul tempo di esecuzione e sul consumo di memoria al crescere della lunghezza
+delle sequenze.
+
+Quando le risorse disponibili lo consentono, entrambi gli algoritmi vengono eseguiti sulla medesima istanza e con lo stesso modello di scoring.
+Per input la cui dimensione rende impraticabile l'allocazione delle matrici complete di Needleman--Wunsch, viene eseguito soltanto Hirschberg;
+tali casi vengono indicati esplicitamente nei risultati.
+
+Nel seguito vengono descritti il dataset utilizzato, l'ambiente sul quale si è lavorato e 
+il protocollo adottato per la raccolta delle misure, in modo tale da poter valutare
+la validità dell'esperimento, che verrà presentato nel capitolo successivo.
+
+\subsection{Dataset}
+
+Per il confronto sperimentale sono state utilizzate due classi di input: sequenze sintetiche generate in modo controllato
+e sequenze biologiche reali ottenute dal database NCBI Nucleotide \cite{ncbi}.
+
+Le sequenze sintetiche permettono di controllare direttamente le dimensioni $n$ e $m$ del problema e vengono quindi utilizzate
+principalmente per studiare la scalabilità dei due algoritmi. La generazione degli input viene effettuata mediante un generatore
+pseudocasuale deterministico, inizializzato attraverso un seed noto, così da rendere riproducibili le istanze utilizzate.
+Sono state considerate tre famiglie di input sintetici:
+
+\begin{description}[
+    style=multiline,
+    labelwidth=2cm,
+    leftmargin=2.5cm,
+    font=\ttfamily
+]
+    \item[random] le due sequenze vengono generate indipendentemente sull'alfabeto $\Sigma_{\text{DNA}}=\{\texttt{A},\texttt{C},\texttt{G},\texttt{T}\}$;
+
+    \item[identiche] la seconda sequenza coincide con la prima;
+
+    \item[mutate] la seconda sequenza viene ottenuta dalla prima sostituendo ciascun simbolo con probabilità $0.05$. In caso di sostituzione viene scelta una delle altre tre basi.
+\end{description}
+
+Sono state considerate sequenze di lunghezza crescente per generare input quadrati $(n=m)$ di lunghezza
+\[
+    250,\;500,\;1000,\;2000,\;4000,\;8000,\;12000.
+\]
+Per ogni combinazione di dimensione e famiglia vengono generate sette istanze indipendenti per configurazione, ottenute mediante seed differenti.
+Per ciascun seed entrambi gli algoritmi vengono quindi eseguiti esattamente sulla stessa coppia di sequenze. 
+
+Sono inoltre considerate alcune istanze "rettangolari", con $n \neq m$, al fine di osservare il comportamento degli algoritmi anche quando le due
+sequenze hanno lunghezze significativamente differenti.
+
+Agli input sintetici sono affiancate quattro coppie di sequenze biologiche reali, scelte in modo da coprire dimensioni
+progressivamente maggiori.
+
+\begin{table}[htbp]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.21\textwidth}
+        >{\raggedright\arraybackslash}X
+        >{\raggedright\arraybackslash}X
+        >{\centering\arraybackslash}p{0.13\textwidth}
+    }
+        \toprule
+        \textbf{Dataset} &
+        \textbf{Sequenza 1} &
+        \textbf{Sequenza 2} &
+        \textbf{Lunghezza} \\
+        \midrule
+
+        RNA ribosomiale batterico &
+        \textit{E. coli} \newline
+        \texttt{NR\_112059.1} &
+        \textit{S. enterica} \newline
+        \texttt{NR\_116005.1} &
+        $\sim 1.5 \cdot 10^{3}$ \\
+
+        \addlinespace
+
+        HIV-1 &
+        HXB2 (subtipo B) \newline
+        \texttt{NC\_001802.1} &
+        ETH2220 (subtipo C) \newline
+        \texttt{U46016.1} &
+        $\sim 10^{4}$ \\
+
+        \addlinespace
+
+        SARS-CoV-2 &
+        Wuhan-Hu-1 \newline
+        \texttt{NC\_045512.2} &
+        Delta (B.1.617.2) \newline
+        \texttt{OK091006.1} &
+        $\sim 3 \cdot 10^{4}$ \\
+
+        \addlinespace
+
+        Genomi plastidici &
+        \textit{A. thaliana} \newline
+        \texttt{NC\_000932.1} &
+        \textit{O. sativa} \newline
+        \texttt{NC\_001320.1} &
+        $\sim 1.5 \cdot 10^{5}$ \\
+
+        \bottomrule
+    \end{tabularx}
+    \caption{Coppie di sequenze biologiche reali utilizzate nel confronto sperimentale.}
+    \label{tab:dataset-reali}
+\end{table}
+
+Le sequenze sono state scaricate manualmente in formato FASTA da NCBI Nucleotide utilizzando gli accession number indicati.
+
+Nella prima coppia sono presenti anche dei simboli \texttt{N}, mentre nella sequenza Delta (B.1.617.2) è presente il simbolo \texttt{Y}, che indicano nucleotidi non determinati, questi vengono sostituiti preliminarmente 
+con simboli scelti pseudocasualmente da $\Sigma_{\text{DNA}}$. Il preprocessing utilizza un seed fissato e viene eseguito una sola
+volta prima della raccolta delle misure, così da garantire che entrambi gli algoritmi operino sulle medesime sequenze e che l'esperimento sia riproducibile.
+Le sequenze reali sono utilizzate come carichi di lavoro realistici di dimensione crescente. Lo score ottenuto non viene pertanto 
+interpretato dal punto di vista biologico; l'obiettivo del loro utilizzo è valutare sperimentalmente tempo di esecuzione e consumo di memoria
+dei due algoritmi.
+
+\subsection{Ambiente hardware e software}
+
+Tutti gli esperimenti sono stati eseguiti sul medesimo sistema, in modo da mantenere costanti le principali condizioni che possono
+influenzare le prestazioni.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Componente} & \textbf{Configurazione} \\
+        \hline
+        Processore & Snapdragon(R) X 12-core X1E80100 @ 3.40 GHz \\
+        Architettura & ARM64 (AArch64) \\
+        Memoria RAM & 16,0 GB \\
+        Memoria visibile a WSL 2 & 9.7 GiB \\
+        Swap WSL 2 & 4.0 GiB \\
+        Sistema operativo host & Microsoft Windows 11 \\
+        Ambiente di esecuzione & WSL 2 (2.6.1.0) -- Ubuntu 24.04.5 LTS \\
+        Compilatore & GCC \\
+        Versione compilatore & 13.3.0 \\
+        Flag di compilazione & \texttt{-O2 -Wall -Wextra -Wpedantic -std=c99} \\
+        \hline
+    \end{tabular}
+    \caption{Ambiente utilizzato per gli esperimenti.}
+    \label{tab:ambiente}
+\end{table}
+
+Sebbene il sistema host disponga di 16 GB di memoria fisica, l'ambiente WSL 2 utilizzato per gli esperimenti dispone di circa 9.7 GiB di memoria RAM,
+oltre a 4.0 GiB di spazio di swap. Tali valori costituiscono quindi il riferimento effettivo per la valutazione della fattibilità delle esecuzioni.
+
+\subsection{Misura dei tempi e della memoria}
+\label{sec:misura}
+
+Ogni esecuzione del benchmark avviene in un processo separato.
+La misura temporale comprende esclusivamente l'esecuzione dell'algoritmo di allineamento. La generazione di input sintetici, la lettura
+e il parsing dei file FASTA e le successive verifiche di correttezza vengono pertanto effettuati al di fuori della regione temporizzata.
+
+Vengono raccolte due misure temporali. Il tempo reale trascorso, o \emph{wall time}, viene misurato utilizzando \texttt{CLOCK\_MONOTONIC},
+mentre il tempo di CPU viene ottenuto mediante \texttt{CLOCK\_PROCESS\_CPUTIME\_ID}. Il wall time viene utilizzato come misura principale delle prestazioni
+temporali, mentre il CPU time costituisce una misura complementare.
+
+Per gli input sintetici, l'ordine delle esecuzioni di Needleman--Wunsch e Hirschberg viene alternato tra istanze successive, così da evitare
+di favorire sistematicamente uno dei due algoritmi a causa dell'ordine di esecuzione.
+
+Per le sequenze biologiche reali la coppia di input rimane invece invariata tra le diverse esecuzioni. Anche in questo caso viene alternato
+l'ordine dei due algoritmi quando entrambi possono essere eseguiti.
+
+Il consumo di memoria viene misurato tramite il massimo \emph{resident set size} del processo, ottenuto mediante \texttt{/usr/bin/time}.
+La misura, espressa in KiB, rappresenta il massimo quantitativo di memoria residente raggiunto durante l'intera esecuzione del processo
+e comprende quindi, oltre alle strutture ausiliarie dell'algoritmo, anche input, output, runtime e altro overhead del processo.
+Essa non coincide pertanto con lo spazio ausiliario teorico analizzato nei capitoli precedenti, ma consente di confrontare empiricamente
+la diversa crescita della memoria richiesta dalle due implementazioni eseguite nelle medesime condizioni.
+
+Al termine viene verificata la validità strutturale dell'allineamento prodotto. Eliminando i gap dalle due sequenze allineate
+devono essere ricostruiti esattamente gli input originali; inoltre lo score dell'allineamento viene ricalcolato e confrontato con quello
+restituito dall'algoritmo.
+Quando una stessa istanza viene elaborata da entrambi gli algoritmi, viene verificato inoltre
+che Needleman--Wunsch e Hirschberg restituiscano lo stesso score ottimo.
+
+Le esecuzioni terminate correttamente vengono aggregate per configurazione. Per wall time, CPU time e memoria vengono calcolate la mediana,
+media e deviazione standard. La mediana viene usata come indicatore principale, poiché meno sensibile a eventuali esecuzioni anomale. Le esecuzioni
+fallite o gli eventuali esaurimenti di memoria vengono invece registrati separatamente e non vengono inclusi nelle statistiche delle esecuzioni valide.
